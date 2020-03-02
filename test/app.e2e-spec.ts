@@ -1,24 +1,21 @@
-import { Test, TestingModule } from '@nestjs/testing';
-import { INestApplication } from '@nestjs/common';
-import * as request from 'supertest';
-import { AppModule } from './../src/app.module';
+import { createMock } from '@golevelup/ts-jest';
+import { INestApplication, LoggerService } from '@nestjs/common';
+import { SpelunkerModule } from '../lib/spelunker';
+import { AppModule } from './app/app.module';
+import { NestFactory } from '@nestjs/core';
+import { exploreOutput } from './fixtures/output';
 
 describe('AppController (e2e)', () => {
   let app: INestApplication;
 
   beforeEach(async () => {
-    const moduleFixture: TestingModule = await Test.createTestingModule({
-      imports: [AppModule],
-    }).compile();
-
-    app = moduleFixture.createNestApplication();
-    await app.init();
+    app = await NestFactory.create(AppModule, { logger: false });
   });
 
-  it('/ (GET)', () => {
-    return request(app.getHttpServer())
-      .get('/')
-      .expect(200)
-      .expect('Hello World!');
+  it('should allow the SpelunkerModule to explore', () => {
+    const mockLogger: LoggerService = createMock<LoggerService>();
+    SpelunkerModule.explore(app, mockLogger);
+    expect(mockLogger.log).toBeCalledTimes(1);
+    expect(mockLogger.log).toBeCalledWith(exploreOutput);
   });
 });
