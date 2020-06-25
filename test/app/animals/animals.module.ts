@@ -8,6 +8,11 @@ import { HamstersModule } from './hamsters/hamsters.module';
 @Module({
   imports: [CatsModule, DogsModule, HamstersModule],
   controllers: [AnimalsController],
-  providers: [AnimalsService],
+  providers: [
+    {
+      provide: AnimalsService,
+      useValue: new AnimalsService(),
+    },
+  ],
 })
 export class AnimalsModule {}
