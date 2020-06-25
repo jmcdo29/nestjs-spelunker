@@ -4,6 +4,11 @@ import { DogsService } from './dogs.service';
 
 @Module({
   controllers: [DogsController],
-  providers: [DogsService],
+  providers: [
+    {
+      provide: DogsService,
+      useFactory: () => new DogsService(),
+    },
+  ],
 })
 export class DogsModule {}

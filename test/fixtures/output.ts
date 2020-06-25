@@ -1,32 +1,56 @@
-export const exploreOutput = {
-  AnimalsModule: {
-    controllers: ['AnimalsController'],
-    exports: [],
-    imports: ['CatsModule', 'DogsModule', 'HamstersModule'],
-    providers: { AnimalsService: { method: 'standard' } },
-  },
-  AppModule: {
-    controllers: [],
-    exports: [],
+import { SpelunkedTree } from 'lib/spelunker.interface';
+
+export const exploreOutput: SpelunkedTree[] = [
+  {
+    name: 'AppModule',
     imports: ['AnimalsModule'],
     providers: {},
+    controllers: [],
+    exports: [],
   },
-  CatsModule: {
+  {
+    name: 'AnimalsModule',
+    imports: ['CatsModule', 'DogsModule', 'HamstersModule'],
+    providers: {
+      AnimalsService: {
+        method: 'value',
+      },
+    },
+    controllers: ['AnimalsController'],
+    exports: [],
+  },
+  {
+    name: 'CatsModule',
+    imports: [],
+    providers: {
+      CatsService: {
+        method: 'standard',
+      },
+    },
     controllers: ['CatsController'],
     exports: [],
-    imports: [],
-    providers: { CatsService: { method: 'standard' } },
   },
-  DogsModule: {
+  {
+    name: 'DogsModule',
+    imports: [],
+    providers: {
+      DogsService: {
+        method: 'factory',
+        injections: [],
+      },
+    },
     controllers: ['DogsController'],
     exports: [],
-    imports: [],
-    providers: { DogsService: { method: 'standard' } },
   },
-  HamstersModule: {
+  {
+    name: 'HamstersModule',
+    imports: [],
+    providers: {
+      HamstersService: {
+        method: 'standard',
+      },
+    },
     controllers: ['HamstersController'],
     exports: [],
-    imports: [],
-    providers: { HamstersService: { method: 'standard' } },
   },
-};
+];

@@ -1,8 +1,7 @@
-import { createMock } from '@golevelup/ts-jest';
-import { INestApplication, LoggerService } from '@nestjs/common';
-import { SpelunkerModule } from '../lib/spelunker';
-import { AppModule } from './app/app.module';
+import { INestApplication } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
+import { SpelunkerModule } from '../lib/';
+import { AppModule } from './app/app.module';
 import { exploreOutput } from './fixtures/output';
 
 describe('AppController (e2e)', () => {
@@ -13,9 +12,7 @@ describe('AppController (e2e)', () => {
   });
 
   it('should allow the SpelunkerModule to explore', () => {
-    const mockLogger: LoggerService = createMock<LoggerService>();
-    SpelunkerModule.explore(app, mockLogger);
-    expect(mockLogger.log).toBeCalledTimes(1);
-    expect(mockLogger.log).toBeCalledWith(exploreOutput);
+    const output = SpelunkerModule.explore(app);
+    expect(output).toEqual(exploreOutput);
   });
 });
