@@ -1,3 +1,9 @@
+## [0.2.1](https://github.com/jmcdo29/nestjs-spelunker/compare/0.2.0...0.2.1) (2020-08-07)
+
+### Features
+
+- change explore param type ([23acdd6](https://github.com/jmcdo29/nestjs-spelunker/commit/23acdd6144b9039c7b585f06db2c0efddf1a3f62))
+
 # [0.2.0](https://github.com/jmcdo29/nestjs-spelunker/compare/0.1.0...0.2.0) (2020-06-25)
 
 ### Bug Fixes
