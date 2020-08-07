@@ -13,7 +13,7 @@
   "types": "dist/index.d.ts",
   "license": "MIT",
   "scripts": {
-    "preversion": "npm run format && npm run lint && npm run build",
+    "preversion": "yarn format && yarn lint && yarn build",
     "version": "conventional-changelog -p angular -i CHANGELOG.md -s && git add CHANGELOG.md",
     "commit": "git-cz",
     "prebuild": "rimraf dist",
