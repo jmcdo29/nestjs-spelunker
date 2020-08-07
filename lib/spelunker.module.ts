@@ -1,11 +1,11 @@
-import { INestApplication, HttpModule } from '@nestjs/common';
+import { INestApplicationContext, HttpModule } from '@nestjs/common';
 import { NestContainer } from '@nestjs/core';
 import { InternalCoreModule } from '@nestjs/core/injector/internal-core-module';
 import { Module as NestModule } from '@nestjs/core/injector/module';
 import { SpelunkedTree } from './spelunker.interface';
 
 export class SpelunkerModule {
-  static explore(app: INestApplication): SpelunkedTree[] {
+  static explore(app: INestApplicationContext): SpelunkedTree[] {
     const dependencyMap = [];
     const modulesArray = Array.from(
       ((app as any).container as NestContainer).getModules().values(),
