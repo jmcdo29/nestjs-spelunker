@@ -14,5 +14,6 @@ import { HamstersModule } from './hamsters/hamsters.module';
       useValue: new AnimalsService(),
     },
   ],
+  exports: [DogsModule],
 })
 export class AnimalsModule {}

@@ -1,4 +1,4 @@
-import { SpelunkedTree } from 'lib/spelunker.interface';
+import { SpelunkedTree, DebuggedTree } from 'lib/spelunker.interface';
 
 export const exploreOutput: SpelunkedTree[] = [
   {
@@ -17,7 +17,7 @@ export const exploreOutput: SpelunkedTree[] = [
       },
     },
     controllers: ['AnimalsController'],
-    exports: [],
+    exports: ['DogsModule'],
   },
   {
     name: 'CatsModule',
@@ -36,11 +36,14 @@ export const exploreOutput: SpelunkedTree[] = [
     providers: {
       DogsService: {
         method: 'factory',
-        injections: [],
+        injections: ['someString'],
+      },
+      someString: {
+        method: 'value',
       },
     },
     controllers: ['DogsController'],
-    exports: [],
+    exports: ['DogsService'],
   },
   {
     name: 'HamstersModule',
@@ -51,6 +54,103 @@ export const exploreOutput: SpelunkedTree[] = [
       },
     },
     controllers: ['HamstersController'],
+    exports: [],
+  },
+];
+
+export const debugOutput: DebuggedTree[] = [
+  {
+    name: 'CatsModule',
+    imports: [],
+    providers: [
+      {
+        name: 'CatsService',
+        dependencies: [],
+        type: 'class',
+      },
+    ],
+    controllers: [
+      {
+        name: 'CatsController',
+        dependencies: ['CatsService'],
+      },
+    ],
+    exports: [],
+  },
+  {
+    name: 'DogsModule',
+    imports: [],
+    providers: [
+      {
+        name: 'someString',
+        dependencies: [],
+        type: 'value',
+      },
+      {
+        name: 'DogsService',
+        dependencies: ['someString'],
+        type: 'factory',
+      },
+    ],
+    controllers: [
+      {
+        name: 'DogsController',
+        dependencies: ['DogsService'],
+      },
+    ],
+    exports: [
+      {
+        name: 'DogsService',
+        type: 'provider',
+      },
+    ],
+  },
+  {
+    name: 'HamstersModule',
+    imports: [],
+    providers: [
+      {
+        name: 'HamstersService',
+        dependencies: [],
+        type: 'class',
+      },
+    ],
+    controllers: [
+      {
+        name: 'HamstersController',
+        dependencies: ['HamstersService'],
+      },
+    ],
+    exports: [],
+  },
+  {
+    name: 'AnimalsModule',
+    imports: ['CatsModule', 'DogsModule', 'HamstersModule'],
+    providers: [
+      {
+        name: 'AnimalsService',
+        dependencies: [],
+        type: 'value',
+      },
+    ],
+    controllers: [
+      {
+        name: 'AnimalsController',
+        dependencies: ['AnimalsService'],
+      },
+    ],
+    exports: [
+      {
+        name: 'DogsModule',
+        type: 'module',
+      },
+    ],
+  },
+  {
+    name: 'AppModule',
+    imports: ['AnimalsModule'],
+    providers: [],
+    controllers: [],
     exports: [],
   },
 ];
