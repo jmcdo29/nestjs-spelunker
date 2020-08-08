@@ -1,3 +1,9 @@
+# [0.3.0](https://github.com/jmcdo29/nestjs-spelunker/compare/0.2.1...0.3.0) (2020-08-08)
+
+### Features
+
+- **module:** adds a debug method to print out modules and deps ([2d8510c](https://github.com/jmcdo29/nestjs-spelunker/commit/2d8510cffe07483521b531bc2760e79641423862))
+
 ## [0.2.1](https://github.com/jmcdo29/nestjs-spelunker/compare/0.2.0...0.2.1) (2020-08-07)
 
 ### Features
