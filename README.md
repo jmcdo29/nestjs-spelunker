@@ -4,11 +4,9 @@
 
 This module does a bit of a dive through the provided module and reads through the dependency tree from the point of entry given. It will find what a module `imports`, `provides`, has `controllers` for, and `exports` and will recursively search through the dependency tree until all modules have been scanned. For `providers` if there is a custom provider, the Spelunker will do its best to determine if Nest is to use a value, a class/standard, or a factory, and if a factory, what value is to be injected.
 
-## Options
+## Exploration Mode
 
-As of now, the module expects two values in its static `explore` method: an `INestApplication`, obtained by using `NestFactory.create()`, and an _optional_ `LoggerService`. If no logger is provided, a Nest Logger with the context "SpelunkerModule" will be created.
-
-## Usage
+### Exploration Usage
 
 Much like the [SwaggerModule](https://github.com/nestjs/swagger), the `SpelunkerModule` is not a module that you register within Nest's DI system, but rather use after the DI system has done all of the heavy lifting. Simple usage of the Spelunker could be like:
 
@@ -22,77 +20,149 @@ async function bootstrap() {
 
 The `SpelunkerModule` will not get in the way of application bootstrapping, and will still allow for the server to listen.
 
-## Sample Output
+### Exploration Sample Output
 
 Currently, the SpelunkerModule only logs to the terminal, though this is temporary and will eventually be to a file so that everything can be stylized. For now, this is a sample of the output:
 
 ```js
-{
-  "AppModule": {
-    "imports": [
-      "AnimalsModule"
-    ],
-    "providers": {
-      "AppService": {
-        "method": "standard"
-      }
-    },
-    "controllers": [
-      "AppController"
-    ],
-    "exports": []
+[
+  {
+    name: 'AppModule',
+    imports: ['AnimalsModule'],
+    providers: {},
+    controllers: [],
+    exports: [],
   },
-  "AnimalsModule": {
-    "imports": [
-      "DogsModule",
-      "CatsModule",
-      "HamstersModule"
-    ],
-    "providers": {},
-    "controllers": [],
-    "exports": []
-  },
-  "DogsModule": {
-    "imports": [],
-    "providers": {
-      "DogsService": {
-        "method": "standard"
-      }
+  {
+    name: 'AnimalsModule',
+    imports: ['CatsModule', 'DogsModule', 'HamstersModule'],
+    providers: {
+      AnimalsService: {
+        method: 'value',
+      },
     },
-    "controllers": [
-      "DogsController"
-    ],
-    "exports": []
+    controllers: ['AnimalsController'],
+    exports: ['DogsModule'],
   },
-  "CatsModule": {
-    "imports": [],
-    "providers": {
-      "CatsService": {
-        "method": "standard"
-      }
+  {
+    name: 'CatsModule',
+    imports: [],
+    providers: {
+      CatsService: {
+        method: 'standard',
+      },
     },
-    "controllers": [
-      "CatsController"
-    ],
-    "exports": []
+    controllers: ['CatsController'],
+    exports: [],
   },
-  "HamstersModule": {
-    "imports": [],
-    "providers": {
-      "HamstersService": {
-        "method": "factory",
-        "injections": []
-      }
+  {
+    name: 'DogsModule',
+    imports: [],
+    providers: {
+      DogsService: {
+        method: 'factory',
+        injections: ['someString'],
+      },
+      someString: {
+        method: 'value',
+      },
     },
-    "controllers": [
-      "HamstersController"
-    ],
-    "exports": []
-  }
-}
+    controllers: ['DogsController'],
+    exports: ['DogsService'],
+  },
+  {
+    name: 'HamstersModule',
+    imports: [],
+    providers: {
+      HamstersService: {
+        method: 'standard',
+      },
+    },
+    controllers: ['HamstersController'],
+    exports: [],
+  },
+];
 ```
 
 In this example, `AppModule` imports `AnimalsModule`, and `AnimalsModule` imports `CatsModule`, `DogsModule`, and `HamstersModule` and each of those has its own set of `providers` and `controllers`.
+
+## Debug Mode
+
+Every now again again you may find yourself running into problems where Nest can't resolve a provider's dependencies. The `SpelunkerModule` has a `debug` method that's meant to help out with this kind of situation.
+
+### Debug Usage
+
+Assume you have a `DogsModule` with the following information:
+
+```ts
+@Module({
+  controller: [DogsController],
+  exports: [DogsService],
+  providers: [
+    {
+      provide: 'someString',
+      useVal:ue: 'something',
+    },
+    {
+      provide: DogsService,
+      inject: ['someString'],
+      useFactory: (someStringInjection: string) => {
+        return new DogsService(someStringInjection),
+      },
+    }
+  ]
+})
+export class DogsModule {}
+```
+
+Now the `SpelunkerModule.debug()` method can be used anywhere with the `DogsModule` to get the dependency tree of the `DogsModule` including what the controller depends on, what imports are made, and what providers exist and their token dependencies.
+
+```ts
+async function bootstrap() {
+  const dogsDeps = SpelunkerModule.debug(DogsModule);
+  const app = await NestFactory.create(AppModule);
+  await app.listen(3000);
+}
+```
+
+Because this method does not require the `INestApplicationContext` it can be used _before_ the `NestFactory` allowing you to have insight into what is being seen as the injection values and what's needed for the module to run.
+
+### Debug Sample Output
+
+The output of the `debug()` method is an array of metadata, imports, controllers, exports, and providers. The `DogsModule` from above would look like this:
+
+```js
+[
+  {
+    name: 'DogsModule',
+    imports: [],
+    providers: [
+      {
+        name: 'someString',
+        dependencies: [],
+        type: 'value',
+      },
+      {
+        name: 'DogsService',
+        dependencies: ['someString'],
+        type: 'factory',
+      },
+    ],
+    controllers: [
+      {
+        name: 'DogsController',
+        dependencies: ['DogsService'],
+      },
+    ],
+    exports: [
+      {
+        name: 'DogsService',
+        type: 'provider',
+      },
+    ],
+  },
+];
+```
 
 ## Caution
 
