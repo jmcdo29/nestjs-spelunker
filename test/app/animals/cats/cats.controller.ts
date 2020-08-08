@@ -1,4 +1,9 @@
-import { Controller } from '@nestjs/common';
+import { Controller, Inject } from '@nestjs/common';
+import { CatsService } from './cats.service';
 
 @Controller('cats')
-export class CatsController {}
+export class CatsController {
+  constructor(
+    @Inject(CatsService.name) private readonly catService: CatsService,
+  ) {}
+}

@@ -6,9 +6,15 @@ import { DogsService } from './dogs.service';
   controllers: [DogsController],
   providers: [
     {
+      provide: 'someString',
+      useValue: 'something',
+    },
+    {
       provide: DogsService,
-      useFactory: () => new DogsService(),
+      useFactory: (something: string) => new DogsService(),
+      inject: ['someString'],
     },
   ],
+  exports: [DogsService],
 })
 export class DogsModule {}
