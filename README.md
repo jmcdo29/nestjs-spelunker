@@ -167,5 +167,3 @@ The output of the `debug()` method is an array of metadata, imports, controllers
 ## Caution
 
 This package is in early development, and any bugs found or improvements that can be thought of would be amazingly helpful. You can [log a bug here](/issues/new), and you can reach out to me on Discord at [PerfectOrphan#6003](https://discordapp.com).
-
-> WARNING: Due to the complex nature of Dynamic Modules and imports, and not wanting to re-write all of Nest's DI logic to determine all of those features, dynamic modules and promised imports currently do not show up in the debug functions output. This is a future enhancement that will take a lot of time to work on. Any help with that is appreciated.
