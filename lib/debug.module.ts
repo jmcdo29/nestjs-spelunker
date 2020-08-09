@@ -126,7 +126,16 @@ export class DebugModule {
     controllers.push(...debuggedControllers);
     exports.push(
       ...modRef.exports.map((exp) => ({
-        name: typeof exp === 'function' ? exp.name : exp.toString(),
+        name:
+          typeof exp === 'function'
+            ? exp.name
+            : // export is an object, not a string or class
+            typeof exp === 'object'
+            ? // object uses a class export
+              ((exp as CustomProvider).provide as Type<any>).name ||
+              // object uses a string/symbol export
+              (exp as CustomProvider).provide.toString()
+            : exp.toString(),
         type: this.exportType(exp as any),
       })),
     );
