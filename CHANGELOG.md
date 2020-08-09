@@ -1,3 +1,15 @@
+# [0.4.0](https://github.com/jmcdo29/nestjs-spelunker/compare/0.3.0...0.4.0) (2020-08-09)
+
+### Features
+
+- **module:** supports dynamic modules ([9e0664c](https://github.com/jmcdo29/nestjs-spelunker/commit/9e0664cb08a4a89e0d72933cbf56e35958ceda6b))
+
+### BREAKING CHANGES
+
+- **module:** The `debug` method is now asynchronous.
+  This is due to the fact of needing to resolve promise
+  based imports.
+
 # [0.3.0](https://github.com/jmcdo29/nestjs-spelunker/compare/0.2.1...0.3.0) (2020-08-08)
 
 ### Features
