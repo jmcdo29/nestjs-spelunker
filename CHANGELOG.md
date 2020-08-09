@@ -1,3 +1,9 @@
+## [0.4.1](https://github.com/jmcdo29/nestjs-spelunker/compare/0.4.0...0.4.1) (2020-08-09)
+
+### Features
+
+- **module:** supports object exports ([66a21ef](https://github.com/jmcdo29/nestjs-spelunker/commit/66a21efc5bd335e0792b50c31e866f9407fdd80a))
+
 # [0.4.0](https://github.com/jmcdo29/nestjs-spelunker/compare/0.3.0...0.4.0) (2020-08-09)
 
 ### Features
