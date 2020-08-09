@@ -3,7 +3,7 @@ import { SpelunkedTree, DebuggedTree } from 'lib/spelunker.interface';
 export const exploreOutput: SpelunkedTree[] = [
   {
     name: 'AppModule',
-    imports: ['AnimalsModule'],
+    imports: ['AnimalsModule', 'OgmaCoreModule'],
     providers: {},
     controllers: [],
     exports: [],
@@ -34,12 +34,12 @@ export const exploreOutput: SpelunkedTree[] = [
     name: 'DogsModule',
     imports: [],
     providers: {
+      someString: {
+        method: 'value',
+      },
       DogsService: {
         method: 'factory',
         injections: ['someString'],
-      },
-      someString: {
-        method: 'value',
       },
     },
     controllers: ['DogsController'],

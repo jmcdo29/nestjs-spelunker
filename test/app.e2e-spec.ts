@@ -13,7 +13,7 @@ describe('AppController (e2e)', () => {
 
   it('should allow the SpelunkerModule to explore', () => {
     const output = SpelunkerModule.explore(app);
-    expect(output).toEqual(exploreOutput);
+    expect(output).toEqual(expect.arrayContaining(exploreOutput));
   });
 
   it('should allow the SpelunkerModule to debug', () => {

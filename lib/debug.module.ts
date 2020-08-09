@@ -9,26 +9,27 @@ import {
 } from './spelunker.interface';
 
 export class DebugModule {
-  static debug(app: Type<any>): DebuggedTree[] {
+  static debug(modRef: Type<any>): DebuggedTree[] {
     const debuggedTree: DebuggedTree[] = [];
     const imports: string[] = [];
     const providers: (DebuggedProvider & { type: ProviderType })[] = [];
     const controllers: DebuggedProvider[] = [];
     const exports: DebuggedExports[] = [];
-    for (const key of Reflect.getMetadataKeys(app)) {
+    console.log(modRef);
+    for (const key of Reflect.getMetadataKeys(modRef)) {
       switch (key) {
         case MODULE_METADATA.IMPORTS:
-          const baseImports = DebugModule.getImports(app);
+          const baseImports = DebugModule.getImports(modRef);
           for (const imp of baseImports) {
             debuggedTree.push(...DebugModule.debug(imp));
           }
           imports.push(...baseImports.map((imp) => imp.name));
           break;
         case MODULE_METADATA.PROVIDERS:
-          providers.push(...DebugModule.getProviders(app));
+          providers.push(...DebugModule.getProviders(modRef));
           break;
         case MODULE_METADATA.CONTROLLERS:
-          const baseControllers = DebugModule.getController(app);
+          const baseControllers = DebugModule.getController(modRef);
           const debuggedControllers = [];
           for (const controller of baseControllers) {
             debuggedControllers.push({
@@ -39,7 +40,7 @@ export class DebugModule {
           controllers.push(...debuggedControllers);
           break;
         case MODULE_METADATA.EXPORTS:
-          const baseExports = DebugModule.getExports(app);
+          const baseExports = DebugModule.getExports(modRef);
           exports.push(
             ...baseExports.map((exp) => ({
               name: exp.name,
@@ -50,7 +51,7 @@ export class DebugModule {
       }
     }
     debuggedTree.push({
-      name: app.name,
+      name: modRef.name,
       imports,
       providers,
       controllers,
@@ -59,18 +60,21 @@ export class DebugModule {
     return debuggedTree;
   }
 
-  private static getImports(app: Type<any>): Array<Type<any>> {
-    return Reflect.getMetadata(MODULE_METADATA.IMPORTS, app);
+  private static getImports(modRef: Type<any>): Array<Type<any>> {
+    return Reflect.getMetadata(MODULE_METADATA.IMPORTS, modRef);
   }
 
-  private static getController(app: Type<any>): Array<Type<any>> {
-    return Reflect.getMetadata(MODULE_METADATA.CONTROLLERS, app);
+  private static getController(modRef: Type<any>): Array<Type<any>> {
+    return Reflect.getMetadata(MODULE_METADATA.CONTROLLERS, modRef);
   }
 
   private static getProviders(
-    app: Type<any>,
+    modRef: Type<any>,
   ): (DebuggedProvider & { type: ProviderType })[] {
-    const baseProviders = Reflect.getMetadata(MODULE_METADATA.PROVIDERS, app);
+    const baseProviders = Reflect.getMetadata(
+      MODULE_METADATA.PROVIDERS,
+      modRef,
+    );
     const debuggedProviders: (DebuggedProvider & {
       type: ProviderType;
     })[] = [];
@@ -113,8 +117,8 @@ export class DebugModule {
     return debuggedProviders;
   }
 
-  private static getExports(app: Type<any>): Array<Type<any>> {
-    return Reflect.getMetadata(MODULE_METADATA.EXPORTS, app);
+  private static getExports(modRef: Type<any>): Array<Type<any>> {
+    return Reflect.getMetadata(MODULE_METADATA.EXPORTS, modRef);
   }
 
   private static getDependencies(classObj: Type<any>): Array<string> {

@@ -36,6 +36,7 @@
     "@nestjs/platform-express": "^7.0.9",
     "@nestjs/schematics": "^7.0.0",
     "@nestjs/testing": "^7.0.9",
+    "@ogma/nestjs-module": "^0.2.1",
     "@types/express": "^4.17.2",
     "@types/jest": "25.2.1",
     "@types/node": "^13.1.6",
