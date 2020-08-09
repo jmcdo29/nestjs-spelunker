@@ -16,8 +16,8 @@ describe('AppController (e2e)', () => {
     expect(output).toEqual(expect.arrayContaining(exploreOutput));
   });
 
-  it('should allow the SpelunkerModule to debug', () => {
-    const output = SpelunkerModule.debug(AppModule);
+  it('should allow the SpelunkerModule to debug', async () => {
+    const output = await SpelunkerModule.debug(AppModule);
     expect(output).toEqual(debugOutput);
   });
 });

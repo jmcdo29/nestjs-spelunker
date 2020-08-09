@@ -60,6 +60,36 @@ export const exploreOutput: SpelunkedTree[] = [
 
 export const debugOutput: DebuggedTree[] = [
   {
+    name: 'AppModule',
+    imports: ['AnimalsModule', 'OgmaCoreModule'],
+    providers: [],
+    controllers: [],
+    exports: [],
+  },
+  {
+    name: 'AnimalsModule',
+    imports: ['CatsModule', 'DogsModule', 'HamstersModule'],
+    providers: [
+      {
+        name: 'AnimalsService',
+        dependencies: [],
+        type: 'value',
+      },
+    ],
+    controllers: [
+      {
+        name: 'AnimalsController',
+        dependencies: ['AnimalsService'],
+      },
+    ],
+    exports: [
+      {
+        name: 'DogsModule',
+        type: 'module',
+      },
+    ],
+  },
+  {
     name: 'CatsModule',
     imports: [],
     providers: [
@@ -124,33 +154,109 @@ export const debugOutput: DebuggedTree[] = [
     exports: [],
   },
   {
-    name: 'AnimalsModule',
-    imports: ['CatsModule', 'DogsModule', 'HamstersModule'],
+    name: 'OgmaCoreModule',
+    imports: [],
     providers: [
       {
-        name: 'AnimalsService',
+        name: 'OGMA_OPTIONS',
         dependencies: [],
         type: 'value',
       },
-    ],
-    controllers: [
       {
-        name: 'AnimalsController',
-        dependencies: ['AnimalsService'],
+        name: 'OGMA_INTERCEPTOR_OPTIONS',
+        dependencies: ['OGMA_OPTIONS'],
+        type: 'factory',
+      },
+      {
+        name: 'OGMA_SERVICE_OPTIONS',
+        dependencies: ['OGMA_OPTIONS'],
+        type: 'factory',
+      },
+      {
+        name: 'APP_INTERCEPTOR',
+        dependencies: [
+          'OGMA_INTERCEPTOR_OPTIONS',
+          'OgmaService',
+          'DelegatorService',
+          'Reflector',
+        ],
+        type: 'factory',
+      },
+      {
+        name: 'OGMA_INSTANCE',
+        dependencies: ['OGMA_SERVICE_OPTIONS'],
+        type: 'factory',
+      },
+      {
+        name: 'HttpInterceptorService',
+        dependencies: ['OGMA_INTERCEPTOR_OPTIONS', 'Reflector'],
+        type: 'factory',
+      },
+      {
+        name: 'WebsocketInterceptorService',
+        dependencies: ['OGMA_INTERCEPTOR_OPTIONS', 'Reflector'],
+        type: 'factory',
+      },
+      {
+        name: 'GqlInterceptorService',
+        dependencies: ['OGMA_INTERCEPTOR_OPTIONS', 'Reflector'],
+        type: 'factory',
+      },
+      {
+        name: 'RpcInterceptorService',
+        dependencies: ['OGMA_INTERCEPTOR_OPTIONS', 'Reflector'],
+        type: 'factory',
+      },
+      {
+        name: 'OgmaService',
+        dependencies: ['OGMA_INSTANCE', 'OGMA_CONTEXT'],
+        type: 'class',
+      },
+      {
+        name: 'DelegatorService',
+        dependencies: [
+          'HttpInterceptorService',
+          'WebsocketInterceptorService',
+          'RpcInterceptorService',
+          'GqlInterceptorService',
+        ],
+        type: 'class',
       },
     ],
+    controllers: [],
     exports: [
       {
-        name: 'DogsModule',
-        type: 'module',
+        name: 'OGMA_INSTANCE',
+        type: 'provider',
+      },
+      {
+        name: 'OGMA_INTERCEPTOR_OPTIONS',
+        type: 'provider',
+      },
+      {
+        name: 'OgmaService',
+        type: 'provider',
+      },
+      {
+        name: 'DelegatorService',
+        type: 'provider',
+      },
+      {
+        name: 'HttpInterceptorService',
+        type: 'provider',
+      },
+      {
+        name: 'GqlInterceptorService',
+        type: 'provider',
+      },
+      {
+        name: 'RpcInterceptorService',
+        type: 'provider',
+      },
+      {
+        name: 'WebsocketInterceptorService',
+        type: 'provider',
       },
     ],
-  },
-  {
-    name: 'AppModule',
-    imports: ['AnimalsModule'],
-    providers: [],
-    controllers: [],
-    exports: [],
   },
 ];

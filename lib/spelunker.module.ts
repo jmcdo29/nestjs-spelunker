@@ -8,7 +8,7 @@ export class SpelunkerModule {
     return ExplorationModule.explore(app);
   }
 
-  static debug(mod: Type<any>): DebuggedTree[] {
+  static async debug(mod: Type<any>): Promise<DebuggedTree[]> {
     return DebugModule.debug(mod);
   }
 }

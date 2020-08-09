@@ -1,4 +1,4 @@
-import { Type } from '@nestjs/common';
+import { Type, DynamicModule, ForwardReference } from '@nestjs/common';
 import { MODULE_METADATA } from '@nestjs/common/constants';
 import {
   DebuggedTree,
@@ -9,55 +9,164 @@ import {
 } from './spelunker.interface';
 
 export class DebugModule {
-  static debug(modRef: Type<any>): DebuggedTree[] {
+  static async debug(
+    modRef: Type<any> | DynamicModule,
+  ): Promise<DebuggedTree[]> {
     const debuggedTree: DebuggedTree[] = [];
+    if (typeof modRef === 'function') {
+      debuggedTree.push(...(await this.getStandardModuleMetadata(modRef)));
+    } else {
+      debuggedTree.push(...(await this.getDynamicModuleMetadata(modRef)));
+    }
+    return debuggedTree.filter((item, index) => {
+      const itemString = JSON.stringify(item);
+      return (
+        index ===
+        debuggedTree.findIndex(
+          (subItem) => itemString === JSON.stringify(subItem),
+        )
+      );
+    });
+  }
+
+  private static async getStandardModuleMetadata(
+    modRef: Type<any>,
+  ): Promise<DebuggedTree[]> {
     const imports: string[] = [];
     const providers: (DebuggedProvider & { type: ProviderType })[] = [];
     const controllers: DebuggedProvider[] = [];
     const exports: DebuggedExports[] = [];
-    console.log(modRef);
+    const subModules: DebuggedTree[] = [];
     for (const key of Reflect.getMetadataKeys(modRef)) {
       switch (key) {
         case MODULE_METADATA.IMPORTS:
-          const baseImports = DebugModule.getImports(modRef);
+          const baseImports = this.getImports(modRef);
           for (const imp of baseImports) {
-            debuggedTree.push(...DebugModule.debug(imp));
+            subModules.push(...(await this.debug(imp)));
           }
-          imports.push(...baseImports.map((imp) => imp.name));
+          imports.push(
+            ...(await Promise.all(
+              baseImports.map(async (imp) => this.getImportName(imp)),
+            )),
+          );
           break;
         case MODULE_METADATA.PROVIDERS:
-          providers.push(...DebugModule.getProviders(modRef));
+          const baseProviders =
+            Reflect.getMetadata(MODULE_METADATA.PROVIDERS, modRef) || [];
+          providers.push(...this.getProviders(baseProviders));
           break;
         case MODULE_METADATA.CONTROLLERS:
-          const baseControllers = DebugModule.getController(modRef);
+          const baseControllers = this.getController(modRef);
           const debuggedControllers = [];
           for (const controller of baseControllers) {
             debuggedControllers.push({
               name: controller.name,
-              dependencies: DebugModule.getDependencies(controller),
+              dependencies: this.getDependencies(controller),
             });
           }
           controllers.push(...debuggedControllers);
           break;
         case MODULE_METADATA.EXPORTS:
-          const baseExports = DebugModule.getExports(modRef);
+          const baseExports = this.getExports(modRef);
           exports.push(
             ...baseExports.map((exp) => ({
               name: exp.name,
-              type: DebugModule.exportType(exp),
+              type: this.exportType(exp),
             })),
           );
           break;
       }
     }
-    debuggedTree.push({
-      name: modRef.name,
-      imports,
-      providers,
-      controllers,
-      exports,
-    });
-    return debuggedTree;
+    return [
+      {
+        name: modRef.name,
+        imports,
+        providers,
+        controllers,
+        exports,
+      },
+    ].concat(subModules);
+  }
+
+  private static async getDynamicModuleMetadata(
+    incomingModule: DynamicModule | Promise<DynamicModule>,
+  ): Promise<DebuggedTree[]> {
+    const imports: string[] = [];
+    const providers: (DebuggedProvider & { type: ProviderType })[] = [];
+    const controllers: DebuggedProvider[] = [];
+    const exports: DebuggedExports[] = [];
+    const subModules: DebuggedTree[] = [];
+    let modRef: DynamicModule;
+    if ((incomingModule as Promise<DynamicModule>).then) {
+      modRef = await incomingModule;
+    } else {
+      modRef = incomingModule as DynamicModule;
+    }
+    console.log(modRef);
+    for (let imp of modRef.imports) {
+      if (typeof imp === 'object') {
+        imp = await this.resolveImport(imp);
+      }
+      subModules.push(...(await this.debug(imp as DynamicModule | Type<any>)));
+      imports.push(await this.getImportName(imp));
+    }
+    providers.push(
+      ...this.getProviders((modRef.providers as Type<any>[]) || []),
+    );
+    const debuggedControllers = [];
+    for (const controller of modRef.controllers || []) {
+      debuggedControllers.push({
+        name: controller.name,
+        dependencies: this.getDependencies(controller),
+      });
+    }
+    controllers.push(...debuggedControllers);
+    exports.push(
+      ...modRef.exports.map((exp) => ({
+        name: typeof exp === 'function' ? exp.name : exp.toString(),
+        type: this.exportType(exp as any),
+      })),
+    );
+    return [
+      {
+        name: modRef.module.name,
+        imports,
+        providers,
+        controllers,
+        exports,
+      },
+    ].concat(subModules);
+  }
+
+  private static async getImportName(
+    imp:
+      | Type<any>
+      | DynamicModule
+      | Promise<DynamicModule>
+      | ForwardReference<any>,
+  ): Promise<string> {
+    let name = '';
+    const resolvedImp = await this.resolveImport(imp);
+    if (typeof resolvedImp === 'function') {
+      name = resolvedImp.name;
+    } else {
+      name = resolvedImp.module.name;
+    }
+    return name;
+  }
+
+  private static async resolveImport(
+    imp:
+      | Type<any>
+      | DynamicModule
+      | Promise<DynamicModule>
+      | ForwardReference<any>,
+  ): Promise<DynamicModule | Type<any>> {
+    return (imp as Promise<DynamicModule>).then
+      ? await (imp as Promise<DynamicModule>)
+      : (imp as ForwardReference<any>).forwardRef
+      ? (imp as ForwardReference<any>).forwardRef()
+      : (imp as Type<any>);
   }
 
   private static getImports(modRef: Type<any>): Array<Type<any>> {
@@ -69,22 +178,18 @@ export class DebugModule {
   }
 
   private static getProviders(
-    modRef: Type<any>,
+    providers: Type<any>[],
   ): (DebuggedProvider & { type: ProviderType })[] {
-    const baseProviders = Reflect.getMetadata(
-      MODULE_METADATA.PROVIDERS,
-      modRef,
-    );
     const debuggedProviders: (DebuggedProvider & {
       type: ProviderType;
     })[] = [];
-    for (const provider of baseProviders) {
+    for (const provider of providers) {
       let dependencies: () => any[];
       // regular providers
-      if (!DebugModule.isCustomProvider(provider)) {
+      if (!this.isCustomProvider(provider)) {
         debuggedProviders.push({
           name: provider.name,
-          dependencies: DebugModule.getDependencies(provider),
+          dependencies: this.getDependencies(provider),
           type: 'class',
         });
         // custom providers
@@ -93,7 +198,7 @@ export class DebugModule {
         const newProvider: DebuggedProvider & {
           type: ProviderType;
         } = {
-          name: DebugModule.getProviderName(provider.provide),
+          name: this.getProviderName(provider.provide),
           dependencies: [],
           type: 'class',
         };
@@ -102,13 +207,11 @@ export class DebugModule {
           dependencies = () => [];
         } else if (provider.useFactory) {
           newProvider.type = 'factory';
-          dependencies = () => provider.inject.map(DebugModule.getProviderName);
+          dependencies = () => provider.inject.map(this.getProviderName);
         } else {
           newProvider.type = 'class';
           dependencies = () =>
-            DebugModule.getDependencies(
-              provider.useClass || provider.useExisting,
-            );
+            this.getDependencies(provider.useClass || provider.useExisting);
         }
         newProvider.dependencies = dependencies();
         debuggedProviders.push(newProvider);
@@ -152,8 +255,13 @@ export class DebugModule {
     return (provider as any).provide;
   }
 
-  private static exportType(classObj: Type<any>): 'module' | 'provider' {
+  private static exportType(
+    classObj: Type<any> | string | symbol,
+  ): 'module' | 'provider' {
     let isModule = false;
+    if (typeof classObj !== 'function') {
+      return 'provider';
+    }
     for (const key of Object.keys(MODULE_METADATA)) {
       if (Reflect.getMetadata(MODULE_METADATA[key], classObj)) {
         isModule = true;
