@@ -119,7 +119,7 @@ Now the `SpelunkerModule.debug()` method can be used anywhere with the `DogsModu
 
 ```ts
 async function bootstrap() {
-  const dogsDeps = SpelunkerModule.debug(DogsModule);
+  const dogsDeps = await SpelunkerModule.debug(DogsModule);
   const app = await NestFactory.create(AppModule);
   await app.listen(3000);
 }
