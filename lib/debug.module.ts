@@ -1,5 +1,9 @@
 import { Type, DynamicModule, ForwardReference } from '@nestjs/common';
-import { MODULE_METADATA } from '@nestjs/common/constants';
+import {
+  MODULE_METADATA,
+  PARAMTYPES_METADATA,
+  SELF_DECLARED_DEPS_METADATA,
+} from '@nestjs/common/constants';
 import {
   DebuggedTree,
   DebuggedProvider,
@@ -226,14 +230,14 @@ export class DebugModule {
   private static getDependencies(classObj: Type<any>): Array<string> {
     const retDeps = [];
     const typedDeps =
-      (Reflect.getMetadata('design:paramtypes', classObj) as Array<
+      (Reflect.getMetadata(PARAMTYPES_METADATA, classObj) as Array<
         Type<any>
       >) || [];
     for (const dep of typedDeps) {
       retDeps.push(dep.name);
     }
     const selfDeps =
-      (Reflect.getMetadata('self:paramtypes', classObj) as [
+      (Reflect.getMetadata(SELF_DECLARED_DEPS_METADATA, classObj) as [
         { index: number; param: string },
       ]) || [];
     for (const selfDep of selfDeps) {
