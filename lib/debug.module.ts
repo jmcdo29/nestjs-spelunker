@@ -102,7 +102,6 @@ export class DebugModule {
     } else {
       modRef = incomingModule as DynamicModule;
     }
-    console.log(modRef);
     for (let imp of modRef.imports) {
       if (typeof imp === 'object') {
         imp = await this.resolveImport(imp);
