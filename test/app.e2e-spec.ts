@@ -3,7 +3,7 @@ import { NestFactory } from '@nestjs/core';
 import { dequal } from 'dequal';
 import { suite } from 'uvu';
 import { equal, is, ok } from 'uvu/assert';
-import { SpelunkerModule } from '../lib/';
+import { SpelunkerModule } from '../src/';
 import { AppModule } from './app/app.module';
 import { debugOutput, exploreOutput } from './fixtures/output';
 
