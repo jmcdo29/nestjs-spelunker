@@ -1,23 +1,36 @@
 import { INestApplication } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
+import { dequal } from 'dequal';
+import { suite } from 'uvu';
+import { equal, is, ok } from 'uvu/assert';
 import { SpelunkerModule } from '../lib/';
 import { AppModule } from './app/app.module';
 import { debugOutput, exploreOutput } from './fixtures/output';
 
-describe('AppController (e2e)', () => {
-  let app: INestApplication;
+const SpelunkerSuite = suite<{ app: INestApplication }>('SpelunkerSuite', {
+  app: undefined,
+});
 
-  beforeEach(async () => {
-    app = await NestFactory.create(AppModule, { logger: false });
-  });
+SpelunkerSuite.before(async (context) => {
+  context.app = await NestFactory.create(AppModule, { logger: false });
+});
+SpelunkerSuite.after(async ({ app }) => app.close());
 
-  it('should allow the SpelunkerModule to explore', () => {
-    const output = SpelunkerModule.explore(app);
-    expect(output).toEqual(expect.arrayContaining(exploreOutput));
-  });
-
-  it('should allow the SpelunkerModule to debug', async () => {
-    const output = await SpelunkerModule.debug(AppModule);
-    expect(output).toEqual(debugOutput);
+SpelunkerSuite('Should allow the spelunkerModule to explore', ({ app }) => {
+  const output = SpelunkerModule.explore(app);
+  exploreOutput.forEach((expected) => {
+    is(
+      output.some((outputPart) => {
+        return dequal(outputPart, expected);
+      }),
+      true,
+    );
   });
 });
+
+SpelunkerSuite('Should allow the SpelunkerModule to debug', async () => {
+  const output = await SpelunkerModule.debug(AppModule);
+  equal(output, debugOutput);
+});
+
+SpelunkerSuite.run();

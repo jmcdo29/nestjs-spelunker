@@ -6,7 +6,7 @@ import { CatsService } from './cats.service';
   controllers: [CatsController],
   providers: [
     {
-      provide: CatsService,
+      provide: CatsService.name,
       useClass: CatsService,
     },
   ],

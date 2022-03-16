@@ -10,7 +10,7 @@ export const exploreOutput: SpelunkedTree[] = [
   },
   {
     name: 'AnimalsModule',
-    imports: ['CatsModule', 'DogsModule', 'HamstersModule'],
+    imports: ['CatsModule', 'DogsModule', 'HamstersModule', 'OgmaCoreModule'],
     providers: {
       AnimalsService: {
         method: 'value',
@@ -21,7 +21,7 @@ export const exploreOutput: SpelunkedTree[] = [
   },
   {
     name: 'CatsModule',
-    imports: [],
+    imports: ['OgmaCoreModule'],
     providers: {
       CatsService: {
         method: 'standard',
@@ -32,7 +32,7 @@ export const exploreOutput: SpelunkedTree[] = [
   },
   {
     name: 'DogsModule',
-    imports: [],
+    imports: ['OgmaCoreModule'],
     providers: {
       someString: {
         method: 'value',
@@ -47,7 +47,7 @@ export const exploreOutput: SpelunkedTree[] = [
   },
   {
     name: 'HamstersModule',
-    imports: [],
+    imports: ['OgmaCoreModule'],
     providers: {
       HamstersService: {
         method: 'standard',
@@ -173,13 +173,8 @@ export const debugOutput: DebuggedTree[] = [
         type: 'factory',
       },
       {
-        name: 'APP_INTERCEPTOR',
-        dependencies: [
-          'OGMA_INTERCEPTOR_OPTIONS',
-          'OgmaService',
-          'DelegatorService',
-          'Reflector',
-        ],
+        name: 'OGMA_TRACE_METHOD_OPTION',
+        dependencies: ['OGMA_SERVICE_OPTIONS'],
         type: 'factory',
       },
       {
@@ -209,7 +204,12 @@ export const debugOutput: DebuggedTree[] = [
       },
       {
         name: 'OgmaService',
-        dependencies: ['OGMA_INSTANCE', 'OGMA_CONTEXT'],
+        dependencies: [
+          'OGMA_INSTANCE',
+          'OGMA_CONTEXT',
+          'Object',
+          'OGMA_TRACE_METHOD_OPTION',
+        ],
         type: 'class',
       },
       {
