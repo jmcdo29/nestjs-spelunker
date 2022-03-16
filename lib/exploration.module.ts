@@ -1,5 +1,5 @@
 import { INestApplicationContext, HttpModule } from '@nestjs/common';
-import { NestContainer } from '@nestjs/core';
+import { ApplicationConfig, ModuleRef, NestContainer } from '@nestjs/core';
 import { InternalCoreModule } from '@nestjs/core/injector/internal-core-module';
 import { Module as NestModule } from '@nestjs/core/injector/module';
 import { SpelunkedTree } from './spelunker.interface';
@@ -13,8 +13,7 @@ export class ExplorationModule {
     modulesArray
       .filter(
         (module) =>
-          module.metatype.name !== InternalCoreModule.name &&
-          module.metatype.name !== HttpModule.name,
+          module.metatype !== InternalCoreModule
       )
       .forEach((module) => {
         dependencyMap.push({
@@ -38,11 +37,13 @@ export class ExplorationModule {
     const providerList = {};
     const providerNames = Array.from(module.providers.keys()).filter(
       (provider) =>
-        provider !== module.metatype.name &&
-        provider !== 'ModuleRef' &&
-        provider !== 'ApplicationConfig',
+        provider !== module.metatype &&
+        provider !== ModuleRef &&
+        provider !== ApplicationConfig,
     );
     providerNames.map((prov) => {
+      const providerToken =
+        typeof prov === 'function' ? prov.name : prov.toString();
       const provider = module.providers.get(prov);
       const metatype = provider.metatype;
       const name = (metatype && metatype.name) || 'useValue';
@@ -69,7 +70,7 @@ export class ExplorationModule {
             method: 'standard',
           };
       }
-      providerList[prov] = provided;
+      providerList[providerToken] = provided;
     });
     return providerList;
   }
@@ -82,7 +83,9 @@ export class ExplorationModule {
 
   private static getExports(module: NestModule): string[] {
     return Array.from(module.exports).map((exportValue) =>
-      exportValue.toString(),
+      typeof exportValue === 'function'
+        ? exportValue.name
+        : exportValue.toString(),
     );
   }
 }
