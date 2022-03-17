@@ -15,12 +15,26 @@ import {
 import { UndefinedClassObject } from './spelunker.messages';
 
 export class DebugModule {
+  private static seenModules: Type<any>[] = [];
   static async debug(
-    modRef: Type<any> | DynamicModule,
+    modRef?: Type<any> | DynamicModule | ForwardReference,
+    importingModule?: string,
   ): Promise<DebuggedTree[]> {
     const debuggedTree: DebuggedTree[] = [];
+    if (modRef === undefined) {
+      process.stdout.write(
+        `The module "${importingModule}" is trying to import an undefined module. Do you have an unmarked circular dependency?`,
+      );
+      return [];
+    }
     if (typeof modRef === 'function') {
       debuggedTree.push(...(await this.getStandardModuleMetadata(modRef)));
+    } else if (this.moduleIsForwardReference(modRef)) {
+      const circMod = (modRef as any).forwardRef();
+      if (!this.seenModules.includes(circMod)) {
+        this.seenModules.push(circMod);
+        debuggedTree.push(...(await this.getStandardModuleMetadata(circMod)));
+      }
     } else {
       debuggedTree.push(...(await this.getDynamicModuleMetadata(modRef)));
     }
@@ -33,6 +47,12 @@ export class DebugModule {
         )
       );
     });
+  }
+
+  private static moduleIsForwardReference(
+    modRef: DynamicModule | ForwardReference,
+  ): modRef is ForwardReference {
+    return Object.keys(modRef).includes('forwardRef');
   }
 
   private static async getStandardModuleMetadata(
@@ -48,7 +68,7 @@ export class DebugModule {
         case MODULE_METADATA.IMPORTS: {
           const baseImports = this.getImports(modRef);
           for (const imp of baseImports) {
-            subModules.push(...(await this.debug(imp)));
+            subModules.push(...(await this.debug(imp, modRef.name)));
           }
           imports.push(
             ...(await Promise.all(
@@ -163,6 +183,9 @@ export class DebugModule {
       | Promise<DynamicModule>
       | ForwardReference<any>,
   ): Promise<string> {
+    if (imp === undefined) {
+      return '*********';
+    }
     let name = '';
     const resolvedImp = await this.resolveImport(imp);
     if (typeof resolvedImp === 'function') {

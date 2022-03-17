@@ -20,7 +20,7 @@
     "build": "nest build",
     "format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\"",
     "lint": "eslint '{src,test}/**/*.ts' --fix",
-    "test": "c8 uvu -r @swc/register test 'spec\\.ts$'"
+    "test": "c8 uvu -r @swc/register test 'index\\.spec\\.ts$'"
   },
   "devDependencies": {
     "@commitlint/cli": "^16.2.1",
