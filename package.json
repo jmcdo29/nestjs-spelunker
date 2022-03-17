@@ -23,6 +23,7 @@
     "test": "c8 uvu -r @swc/register test 'index\\.spec\\.ts$'"
   },
   "devDependencies": {
+    "@changesets/cli": "^2.21.1",
     "@commitlint/cli": "^16.2.1",
     "@commitlint/config-conventional": "^16.2.1",
     "@golevelup/ts-jest": "^0.2.1",
