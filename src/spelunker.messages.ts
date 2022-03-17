@@ -17,13 +17,13 @@ const withMinRepro = style.cyan.apply(
 export const UndefinedClassObject = `
 ${baseMessage}
 
-Somehow, the ${style.underline.apply('useClass')} and ${style.underline.apply(
+Somehow, the ${style.bold.apply('useClass')} and ${style.bold.apply(
   'useExisting',
-)} options are both ${style.red.underline.apply(
+)} options are both ${style.red.bold.apply(
   'undefined',
-)} in a custom provider without a ${style.underline.apply(
+)} in a custom provider without a ${style.bold.apply(
   'useFactory',
-)} or a ${style.underline.apply('useValue')}.
+)} or a ${style.bold.apply('useValue')}.
 
 
 ${newIssue}
@@ -36,7 +36,7 @@ ${baseMessage}
 
 Somehow the token found for "${style.yellow.apply(
   provToken,
-)}" came back as ${style.red.underline.apply(
+)}" came back as ${style.red.bold.apply(
   'undefined',
 )}. No idea how as this is all coming from Nest's internals in the first place.
 
