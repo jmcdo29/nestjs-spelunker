@@ -1,4 +1,4 @@
-import { SpelunkedTree, DebuggedTree } from 'src/spelunker.interface';
+import { DebuggedTree, SpelunkedTree } from '../../src/spelunker.interface';
 
 export const exploreOutput: SpelunkedTree[] = [
   {
