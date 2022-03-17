@@ -4,6 +4,16 @@
 
 This module does a bit of a dive through the provided module and reads through the dependency tree from the point of entry given. It will find what a module `imports`, `provides`, has `controllers` for, and `exports` and will recursively search through the dependency tree until all modules have been scanned. For `providers` if there is a custom provider, the Spelunker will do its best to determine if Nest is to use a value, a class/standard, or a factory, and if a factory, what value is to be injected.
 
+## Installation
+
+Pretty straightforward installation:
+
+```sh
+npm i nestjs-spelunker
+yarn add nestjs-spelunker
+pnpm i nestjs-spelunker
+```
+
 ## Exploration Mode
 
 ### Exploration Usage
@@ -163,6 +173,10 @@ The output of the `debug()` method is an array of metadata, imports, controllers
   },
 ];
 ```
+
+### Debug Messages
+
+If you are using the `debug` method and happen to have an invalid circular, the `SpelunkerModule` will write message to the log about the possibility of an unmarked circular dependency, meaning a missing `forwardRef` and the output will have `*****` in place of the `imports` where there's a problem reading the imported module.
 
 ## Caution
 
