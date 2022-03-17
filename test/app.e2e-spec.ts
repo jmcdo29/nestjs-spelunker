@@ -5,8 +5,8 @@ import { suite } from 'uvu';
 import { equal, is } from 'uvu/assert';
 
 import { SpelunkerModule } from '../src/';
-import { AppModule } from './app/app.module';
 import { debugOutput, exploreOutput } from './fixtures/output';
+import { AppModule } from './large-app/app.module';
 
 const SpelunkerSuite = suite<{ app: INestApplication }>('SpelunkerSuite', {
   // @ts-expect-error property will be defined in the `before` context
