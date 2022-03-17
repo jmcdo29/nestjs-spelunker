@@ -101,7 +101,7 @@ Assume you have a `DogsModule` with the following information:
   providers: [
     {
       provide: 'someString',
-      useVal:ue: 'something',
+      useValue: 'something',
     },
     {
       provide: DogsService,
