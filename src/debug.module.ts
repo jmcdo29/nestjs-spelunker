@@ -1,16 +1,18 @@
-import { Type, DynamicModule, ForwardReference } from '@nestjs/common';
+import { DynamicModule, ForwardReference, Type } from '@nestjs/common';
 import {
   MODULE_METADATA,
   PARAMTYPES_METADATA,
   SELF_DECLARED_DEPS_METADATA,
 } from '@nestjs/common/constants';
+
 import {
-  DebuggedTree,
-  DebuggedProvider,
-  ProviderType,
   CustomProvider,
   DebuggedExports,
+  DebuggedProvider,
+  DebuggedTree,
+  ProviderType,
 } from './spelunker.interface';
+import { UndefinedClassObject } from './spelunker.messages';
 
 export class DebugModule {
   static async debug(
@@ -43,7 +45,7 @@ export class DebugModule {
     const subModules: DebuggedTree[] = [];
     for (const key of Reflect.getMetadataKeys(modRef)) {
       switch (key) {
-        case MODULE_METADATA.IMPORTS:
+        case MODULE_METADATA.IMPORTS: {
           const baseImports = this.getImports(modRef);
           for (const imp of baseImports) {
             subModules.push(...(await this.debug(imp)));
@@ -54,12 +56,14 @@ export class DebugModule {
             )),
           );
           break;
-        case MODULE_METADATA.PROVIDERS:
+        }
+        case MODULE_METADATA.PROVIDERS: {
           const baseProviders =
             Reflect.getMetadata(MODULE_METADATA.PROVIDERS, modRef) || [];
           providers.push(...this.getProviders(baseProviders));
           break;
-        case MODULE_METADATA.CONTROLLERS:
+        }
+        case MODULE_METADATA.CONTROLLERS: {
           const baseControllers = this.getController(modRef);
           const debuggedControllers = [];
           for (const controller of baseControllers) {
@@ -70,7 +74,8 @@ export class DebugModule {
           }
           controllers.push(...debuggedControllers);
           break;
-        case MODULE_METADATA.EXPORTS:
+        }
+        case MODULE_METADATA.EXPORTS: {
           const baseExports = this.getExports(modRef);
           exports.push(
             ...baseExports.map((exp) => ({
@@ -79,6 +84,7 @@ export class DebugModule {
             })),
           );
           break;
+        }
       }
     }
     return [
@@ -106,7 +112,7 @@ export class DebugModule {
     } else {
       modRef = incomingModule as DynamicModule;
     }
-    for (let imp of modRef.imports) {
+    for (let imp of modRef.imports ?? []) {
       if (typeof imp === 'object') {
         imp = await this.resolveImport(imp);
       }
@@ -125,7 +131,7 @@ export class DebugModule {
     }
     controllers.push(...debuggedControllers);
     exports.push(
-      ...modRef.exports.map((exp) => ({
+      ...(modRef.exports ?? []).map((exp) => ({
         name:
           typeof exp === 'function'
             ? exp.name
@@ -219,11 +225,12 @@ export class DebugModule {
           dependencies = () => [];
         } else if (provider.useFactory) {
           newProvider.type = 'factory';
-          dependencies = () => provider.inject.map(this.getProviderName);
+          dependencies = () =>
+            (provider.inject ?? []).map(this.getProviderName);
         } else {
           newProvider.type = 'class';
           dependencies = () =>
-            this.getDependencies(provider.useClass || provider.useExisting);
+            this.getDependencies(provider.useClass ?? provider.useExisting);
         }
         newProvider.dependencies = dependencies();
         debuggedProviders.push(newProvider);
@@ -236,7 +243,10 @@ export class DebugModule {
     return Reflect.getMetadata(MODULE_METADATA.EXPORTS, modRef);
   }
 
-  private static getDependencies(classObj: Type<any>): Array<string> {
+  private static getDependencies(classObj?: Type<any>): Array<string> {
+    if (!classObj) {
+      throw new Error(UndefinedClassObject);
+    }
     const retDeps = [];
     const typedDeps =
       (Reflect.getMetadata(PARAMTYPES_METADATA, classObj) as Array<
@@ -275,7 +285,12 @@ export class DebugModule {
       return 'provider';
     }
     for (const key of Object.keys(MODULE_METADATA)) {
-      if (Reflect.getMetadata(MODULE_METADATA[key], classObj)) {
+      if (
+        Reflect.getMetadata(
+          MODULE_METADATA[key as keyof typeof MODULE_METADATA],
+          classObj,
+        )
+      ) {
         isModule = true;
       }
     }

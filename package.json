@@ -19,7 +19,7 @@
     "prebuild": "rimraf dist",
     "build": "nest build",
     "format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\"",
-    "lint": "eslint '{libs,test}/**/*.ts' --fix",
+    "lint": "eslint '{src,test}/**/*.ts' --fix",
     "test": "c8 uvu -r @swc/register test 'spec\\.ts$'"
   },
   "devDependencies": {
@@ -46,6 +46,8 @@
     "eslint": "^8.11.0",
     "eslint-config-prettier": "^8.5.0",
     "eslint-plugin-import": "^2.19.1",
+    "eslint-plugin-prettier": "^4.0.0",
+    "eslint-plugin-simple-import-sort": "^7.0.0",
     "express": "^4.17.1",
     "husky": "^7.0.4",
     "lint-staged": "^12.3.5",
@@ -60,39 +62,5 @@
     "@nestjs/common": ">6.11.0",
     "@nestjs/core": ">6.11.0",
     "reflect-metadata": "^0.1.0"
-  },
-  "jest": {
-    "moduleFileExtensions": [
-      "js",
-      "json",
-      "ts"
-    ],
-    "rootDir": "src",
-    "testRegex": ".spec.ts$",
-    "transform": {
-      "^.+\\.(t|j)s$": "ts-jest"
-    },
-    "coverageDirectory": "../coverage",
-    "testEnvironment": "node"
-  },
-  "husky": {
-    "hooks": {
-      "pre-commit": "lint-staged",
-      "commit-msg": "commitlint -E HUSKY_GIT_PARAMS"
-    }
-  },
-  "lint-staged": {
-    "*.ts": [
-      "prettier --write",
-      "eslint --fix"
-    ],
-    "*.{md,html,json,js}": [
-      "prettier --write"
-    ]
-  },
-  "config": {
-    "commitizen": {
-      "path": "./node_modules/cz-conventional-changelog"
-    }
   }
 }

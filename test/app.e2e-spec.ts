@@ -2,12 +2,14 @@ import { INestApplication } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
 import { dequal } from 'dequal';
 import { suite } from 'uvu';
-import { equal, is, ok } from 'uvu/assert';
+import { equal, is } from 'uvu/assert';
+
 import { SpelunkerModule } from '../src/';
 import { AppModule } from './app/app.module';
 import { debugOutput, exploreOutput } from './fixtures/output';
 
 const SpelunkerSuite = suite<{ app: INestApplication }>('SpelunkerSuite', {
+  // @ts-expect-error property will be defined in the `before` context
   app: undefined,
 });
 

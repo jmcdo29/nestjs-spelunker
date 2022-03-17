@@ -1,4 +1,5 @@
 import { Controller, Inject } from '@nestjs/common';
+
 import { CatsService } from './cats.service';
 
 @Controller('cats')

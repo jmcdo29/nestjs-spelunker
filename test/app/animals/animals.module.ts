@@ -1,4 +1,5 @@
 import { Module } from '@nestjs/common';
+
 import { AnimalsController } from './animals.controller';
 import { AnimalsService } from './animals.service';
 import { CatsModule } from './cats/cats.module';

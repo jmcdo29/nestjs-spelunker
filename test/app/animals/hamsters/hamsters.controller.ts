@@ -1,4 +1,5 @@
 import { Controller } from '@nestjs/common';
+
 import { HamstersService } from './hamsters.service';
 
 @Controller('hamsters')

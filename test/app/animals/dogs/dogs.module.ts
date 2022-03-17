@@ -1,4 +1,5 @@
 import { Module } from '@nestjs/common';
+
 import { DogsController } from './dogs.controller';
 import { DogsService } from './dogs.service';
 
@@ -11,7 +12,7 @@ import { DogsService } from './dogs.service';
     },
     {
       provide: DogsService,
-      useFactory: (something: string) => new DogsService(),
+      useFactory: (_something: string) => new DogsService(),
       inject: ['someString'],
     },
   ],
