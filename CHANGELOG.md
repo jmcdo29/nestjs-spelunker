@@ -1,5 +1,17 @@
 ## [0.4.1](https://github.com/jmcdo29/nestjs-spelunker/compare/0.4.0...0.4.1) (2020-08-09)
 
+## 1.0.0
+
+### Major Changes
+
+- bdd36bc: First major version of the nestjs-spelunker package.
+  Nest v8 is supported with it's new class token syntax
+  pared down to just the class name. Circular dependencies
+  that are not properly forwardReferenced will no longer
+  crash the `debug` method. `@ogma/styler` is being used
+  to color the output of the module in case of uncertain
+  errors or improper tokens.
+
 ### Features
 
 - **module:** supports object exports ([66a21ef](https://github.com/jmcdo29/nestjs-spelunker/commit/66a21efc5bd335e0792b50c31e866f9407fdd80a))
