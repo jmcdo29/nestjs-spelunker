@@ -11,6 +11,7 @@ specifiers:
   '@nestjs/schematics': ^8.0.8
   '@nestjs/testing': ^8.4.1
   '@ogma/nestjs-module': ^3.2.0
+  '@ogma/styler': ^1.0.0
   '@swc/core': ^1.2.155
   '@swc/register': ^0.1.10
   '@types/express': ^4.17.2
@@ -35,6 +36,9 @@ specifiers:
   rxjs: ^7.5.5
   typescript: ^4.6.2
   uvu: ^0.5.3
+
+dependencies:
+  '@ogma/styler': 1.0.0
 
 devDependencies:
   '@commitlint/cli': 16.2.1_@swc+core@1.2.155
@@ -629,7 +633,6 @@ packages:
 
   /@ogma/common/1.0.0:
     resolution: {integrity: sha512-IXvSnXbXccpxJR+UbN2fxp30R/44VFpx/T0ungb1PMwLa9BLmtbeQIXqc9TR11gRaDNY0e78tqVckau8oyXK0A==}
-    dev: true
 
   /@ogma/logger/2.2.0:
     resolution: {integrity: sha512-AWNs1wYjjMREyiro5F5di3pJcwaST/jV/2Dx7SFYLNTGZzZO5qWSsUidu4gBLFzGANyhxeLuJYyXAp/QivIRCA==}
@@ -661,7 +664,6 @@ packages:
     resolution: {integrity: sha512-Twtijg2eUS4HEPyic0FEpkdJgRtLSvVow/3gmLsMkyU+GhSm80PnRlc6q1N1rmf1EQhuwGZLKhS30sYIuFV38A==}
     dependencies:
       '@ogma/common': 1.0.0
-    dev: true
 
   /@swc/core-android-arm-eabi/1.2.155:
     resolution: {integrity: sha512-5gFUHeKvdifHgIxu5wc20r0W3WjBYazbZ91u6uT4NUasBDf44k7HvmXMi5r0+QDWX739hy17WzNqKyfnWIHAVQ==}
