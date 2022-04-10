@@ -5,7 +5,11 @@ import { suite } from 'uvu';
 import { equal, is } from 'uvu/assert';
 
 import { SpelunkerModule } from '../../src/';
-import { debugOutput, exploreOutput } from '../fixtures/output';
+import {
+  debugOutput,
+  exploreOutput,
+  graphEdgesOutput,
+} from '../fixtures/output';
 import { AppModule } from './app.module';
 
 export const SpelunkerSuite = suite<{ app: INestApplication }>(
@@ -36,4 +40,14 @@ SpelunkerSuite('Should allow the spelunkerModule to explore', ({ app }) => {
 SpelunkerSuite('Should allow the SpelunkerModule to debug', async () => {
   const output = await SpelunkerModule.debug(AppModule);
   equal(output, debugOutput);
+});
+
+SpelunkerSuite('Should allow the SpelunkerModule to graph', ({ app }) => {
+  const tree = SpelunkerModule.explore(app);
+  const root = SpelunkerModule.graph(tree);
+  const edges = SpelunkerModule.findGraphEdges(root);
+  equal(
+    edges.map((e) => `${e.from.module.name}-->${e.to.module.name}`),
+    graphEdgesOutput,
+  );
 });

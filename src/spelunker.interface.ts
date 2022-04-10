@@ -41,3 +41,14 @@ export interface CustomProvider {
   useExisting?: Type<any>;
   inject?: any[];
 }
+
+export interface SpelunkedNode {
+  dependencies: Set<SpelunkedNode>;
+  dependents: Set<SpelunkedNode>;
+  module: SpelunkedTree;
+}
+
+export interface SpelunkedEdge {
+  from: SpelunkedNode;
+  to: SpelunkedNode;
+}

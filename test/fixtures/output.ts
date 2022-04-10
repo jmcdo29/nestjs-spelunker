@@ -260,3 +260,15 @@ export const debugOutput: DebuggedTree[] = [
     ],
   },
 ];
+
+export const graphEdgesOutput = [
+  'AppModule-->AnimalsModule',
+  'AnimalsModule-->CatsModule',
+  'CatsModule-->OgmaCoreModule',
+  'AnimalsModule-->DogsModule',
+  'DogsModule-->OgmaCoreModule',
+  'AnimalsModule-->HamstersModule',
+  'HamstersModule-->OgmaCoreModule',
+  'AnimalsModule-->OgmaCoreModule',
+  'AppModule-->OgmaCoreModule',
+];
