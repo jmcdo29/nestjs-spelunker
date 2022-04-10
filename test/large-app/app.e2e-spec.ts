@@ -6,6 +6,7 @@ import { equal, is } from 'uvu/assert';
 
 import { SpelunkerModule } from '../../src/';
 import {
+  cyclicGraphEdgesOutput,
   debugOutput,
   exploreOutput,
   graphEdgesOutput,
@@ -49,5 +50,16 @@ SpelunkerSuite('Should allow the SpelunkerModule to graph', ({ app }) => {
   equal(
     edges.map((e) => `${e.from.module.name}-->${e.to.module.name}`),
     graphEdgesOutput,
+  );
+});
+
+SpelunkerSuite('Should handle a module circular dependency', ({ app }) => {
+  const tree = SpelunkerModule.explore(app);
+  tree.at(-1)?.imports.push('AppModule');
+  const root = SpelunkerModule.graph(tree);
+  const edges = SpelunkerModule.findGraphEdges(root);
+  equal(
+    edges.map((e) => `${e.from.module.name}-->${e.to.module.name}`),
+    cyclicGraphEdgesOutput,
   );
 });

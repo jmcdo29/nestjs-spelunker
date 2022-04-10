@@ -22,7 +22,7 @@ export class GraphingModule {
   }
 
   static getEdges(root: SpelunkedNode): SpelunkedEdge[] {
-    return this.getEdgesRecursively(root);
+    return [...this.getEdgesRecursively(root).values()];
   }
 
   private static findDependencies(
@@ -40,8 +40,14 @@ export class GraphingModule {
     });
   }
 
+  /**
+   * Find the root node, which is assumed to be the first node on which no other
+   * nodes depend. If no such node exists, arbitrarily chose the first one as the
+   * root.
+   */
   private static findRoot(nodeMap: Map<string, SpelunkedNode>): SpelunkedNode {
-    const root = [...nodeMap.values()].find((n) => n.dependents.size === 0);
+    const nodes = [...nodeMap.values()];
+    const root = nodes.find((n) => n.dependents.size === 0) ?? nodes[0];
 
     if (!root) throw new Error('Unable to find root node');
 
@@ -50,16 +56,18 @@ export class GraphingModule {
 
   private static getEdgesRecursively(
     root: SpelunkedNode,
-    depth = 0,
-  ): SpelunkedEdge[] {
-    if (depth > 20) return []; // TODO Smarter way to prune circular deps
+    visitedNodes: Set<SpelunkedNode> = new Set(),
+  ): Set<SpelunkedEdge> {
+    // short-circuit cycles
+    if (visitedNodes.has(root)) return new Set();
 
-    return [...root.dependencies.values()].flatMap((n) => [
-      {
-        from: root,
-        to: n,
-      },
-      ...this.getEdgesRecursively(n, depth + 1),
-    ]);
+    visitedNodes.add(root);
+
+    return [...root.dependencies.values()].reduce((set, n) => {
+      set.add({ from: root, to: n });
+      this.getEdgesRecursively(n, visitedNodes).forEach((e) => set.add(e));
+
+      return set;
+    }, new Set<SpelunkedEdge>());
   }
 }
