@@ -272,3 +272,16 @@ export const graphEdgesOutput = [
   'AnimalsModule-->OgmaCoreModule',
   'AppModule-->OgmaCoreModule',
 ];
+
+export const cyclicGraphEdgesOutput = [
+  'AppModule-->AnimalsModule',
+  'AnimalsModule-->CatsModule',
+  'CatsModule-->OgmaCoreModule',
+  'OgmaCoreModule-->AppModule',
+  'AnimalsModule-->DogsModule',
+  'DogsModule-->OgmaCoreModule',
+  'AnimalsModule-->HamstersModule',
+  'HamstersModule-->OgmaCoreModule',
+  'AnimalsModule-->OgmaCoreModule',
+  'AppModule-->OgmaCoreModule',
+];
