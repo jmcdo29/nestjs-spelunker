@@ -96,6 +96,35 @@ Currently, the SpelunkerModule only logs to the terminal, though this is tempora
 
 In this example, `AppModule` imports `AnimalsModule`, and `AnimalsModule` imports `CatsModule`, `DogsModule`, and `HamstersModule` and each of those has its own set of `providers` and `controllers`.
 
+## Graph Mode
+
+Sometimes you want to visualize the module inter-dependencies so you can better reason about them. The `SpelunkerModule` has a `graph` method that builds on the output of the `explore` method by generating a doubly-linked graph where each node represents a module and each edge a link to that module's dependencies or dependents. The `getEdges` method can traverse this graph from from the root (or any given) node, recursively following dependencies and returning a flat array of edges. These edges can be easily mapped to inputs for graphing tools, such as [Mermaid](https://mermaid-js.github.io/mermaid/#/).
+
+### Graphing Usage
+
+Assume you have the sample output of the above `explore` section in a variable called tree. The following code will generate the list of edges suitable for pasting into a [Mermaid](https://mermaid-js.github.io/mermaid/#/) graph.
+
+```ts
+const root = SpelunkerModule.graph(tree);
+const edges = SpelunkerModule.findGraphEdges(root);
+const mermaidEdges = edges.map(
+  ({ from, to }) => `${from.module.name}-->${to.module.name}`,
+);
+console.log(mermaidEdges.join('\n'));
+```
+
+```mermaid
+graph LR
+  AppModule-->AnimalsModule
+  AnimalsModule-->CatsModule
+  AnimalsModule-->DogsModule
+  AnimalsModule-->HamstersModule
+```
+
+The edges can certainly be transformed into formats more suitable for other visualization tools. And the graph can be traversed with other strategies.
+
+NOTE: Circular dependencies are currently, naively dealt with by arbitrarily ending recursion at a depth of 20.
+
 ## Debug Mode
 
 Every now again again you may find yourself running into problems where Nest can't resolve a provider's dependencies. The `SpelunkerModule` has a `debug` method that's meant to help out with this kind of situation.
