@@ -123,8 +123,6 @@ graph LR
 
 The edges can certainly be transformed into formats more suitable for other visualization tools. And the graph can be traversed with other strategies.
 
-NOTE: Circular dependencies are currently, naively dealt with by arbitrarily ending recursion at a depth of 20.
-
 ## Debug Mode
 
 Every now again again you may find yourself running into problems where Nest can't resolve a provider's dependencies. The `SpelunkerModule` has a `debug` method that's meant to help out with this kind of situation.
