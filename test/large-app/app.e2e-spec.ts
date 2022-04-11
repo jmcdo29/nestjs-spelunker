@@ -53,13 +53,16 @@ SpelunkerSuite('Should allow the SpelunkerModule to graph', ({ app }) => {
   );
 });
 
-SpelunkerSuite('Should handle a module circular dependency', ({ app }) => {
-  const tree = SpelunkerModule.explore(app);
-  tree.at(-1)?.imports.push('AppModule');
-  const root = SpelunkerModule.graph(tree);
-  const edges = SpelunkerModule.findGraphEdges(root);
-  equal(
-    edges.map((e) => `${e.from.module.name}-->${e.to.module.name}`),
-    cyclicGraphEdgesOutput,
-  );
-});
+SpelunkerSuite(
+  'Should handle a module circular dependency when finding graph edges',
+  ({ app }) => {
+    const tree = SpelunkerModule.explore(app);
+    tree.slice(-1)[0].imports.push('AppModule');
+    const root = SpelunkerModule.graph(tree);
+    const edges = SpelunkerModule.findGraphEdges(root);
+    equal(
+      edges.map((e) => `${e.from.module.name}-->${e.to.module.name}`),
+      cyclicGraphEdgesOutput,
+    );
+  },
+);
