@@ -1,5 +1,11 @@
 ## [0.4.1](https://github.com/jmcdo29/nestjs-spelunker/compare/0.4.0...0.4.1) (2020-08-09)
 
+## 1.1.0
+
+### Minor Changes
+
+- 434eee4: Added graphing.module to generate a SpelunkedNode graph data structure and dependencies as an array of SpelunkedEdge objects.
+
 ## 1.0.0
 
 ### Major Changes
