@@ -1,5 +1,11 @@
 ## [0.4.1](https://github.com/jmcdo29/nestjs-spelunker/compare/0.4.0...0.4.1) (2020-08-09)
 
+## 1.1.1
+
+### Patch Changes
+
+- 58ae380: Removes cyclic dependencies caveat in README Graph Mode
+
 ## 1.1.0
 
 ### Minor Changes
