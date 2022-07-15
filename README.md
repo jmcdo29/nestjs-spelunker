@@ -18,13 +18,16 @@ pnpm i nestjs-spelunker
 
 ### Exploration Usage
 
-Much like the [SwaggerModule](https://github.com/nestjs/swagger), the `SpelunkerModule` is not a module that you register within Nest's DI system, but rather use after the DI system has done all of the heavy lifting. Simple usage of the Spelunker could be like:
+Much like the [`SwaggerModule`](https://github.com/nestjs/swagger), the `SpelunkerModule` is not a module that you register within Nest's DI system, but rather use after the DI system has done all of the heavy lifting. Simple usage of the Spelunker could be like:
 
 ```ts
+// ...
+import { SpelunkerModule } from 'nestjs-spelunker'; 
+
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
   SpelunkerModule.explore(app);
-  app.listen(3000);
+  // ...
 }
 ```
 
@@ -105,10 +108,12 @@ Sometimes you want to visualize the module inter-dependencies so you can better 
 Assume you have the sample output of the above `explore` section in a variable called tree. The following code will generate the list of edges suitable for pasting into a [Mermaid](https://mermaid-js.github.io/mermaid/#/) graph.
 
 ```ts
+const tree = SpelunkerModule.explore(app);
 const root = SpelunkerModule.graph(tree);
 const edges = SpelunkerModule.findGraphEdges(root);
+console.log('graph LR');
 const mermaidEdges = edges.map(
-  ({ from, to }) => `${from.module.name}-->${to.module.name}`,
+  ({ from, to }) => `  ${from.module.name}-->${to.module.name}`,
 );
 console.log(mermaidEdges.join('\n'));
 ```
@@ -207,4 +212,4 @@ If you are using the `debug` method and happen to have an invalid circular, the 
 
 ## Caution
 
-This package is in early development, and any bugs found or improvements that can be thought of would be amazingly helpful. You can [log a bug here](/issues/new), and you can reach out to me on Discord at [PerfectOrphan#6003](https://discordapp.com).
+This package is in early development, and any bugs found or improvements that can be thought of would be amazingly helpful. You can [log a bug here](../../issues/new), and you can reach out to me on Discord at [PerfectOrphan#6003](https://discordapp.com).
