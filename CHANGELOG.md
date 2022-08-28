@@ -1,5 +1,11 @@
 ## [0.4.1](https://github.com/jmcdo29/nestjs-spelunker/compare/0.4.0...0.4.1) (2020-08-09)
 
+## 1.1.2
+
+### Patch Changes
+
+- 347c65b: docs: minor improvements on code snippets & fix hyperlink
+
 ## 1.1.1
 
 ### Patch Changes
