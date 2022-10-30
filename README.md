@@ -26,75 +26,155 @@ import { SpelunkerModule } from 'nestjs-spelunker';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
-  SpelunkerModule.explore(app);
+  // const app = await NestFactory.createApplicationContext(AppModule);
+  console.log(SpelunkerModule.explore(app));
   // ...
 }
+// ...
 ```
 
 The `SpelunkerModule` will not get in the way of application bootstrapping, and will still allow for the server to listen.
 
 ### Exploration Sample Output
 
-Currently, the SpelunkerModule only logs to the terminal, though this is temporary and will eventually be to a file so that everything can be stylized. For now, this is a sample of the output:
+Given the following source code
+
+<details>
+<summary>Sample code</summary>
+
+```ts
+// main.ts
+import * as util from 'util'
+import { NestFactory } from '@nestjs/core'
+import { SpelunkerModule } from 'nestjs-spelunker'
+import { AppModule } from './app.module'
+
+async function bootstrap() {
+  const app = await NestFactory.createApplicationContext(AppModule, { logger: false })
+  console.log(
+    util.inspect( SpelunkerModule.explore(app), { depth: Infinity, colors: true } )
+  )
+}
+bootstrap();
+
+// src/app.module.ts
+import { Module, Injectable, Controller } from '@nestjs/common'
+
+@Controller('hamsters')
+export class HamstersController {}
+@Injectable()
+export class HamstersService {}
+
+@Module({
+  controllers: [HamstersController],
+  providers: [HamstersService],
+})
+export class HamstersModule {}
+
+
+@Controller('dogs')
+export class DogsController {}
+export class DogsService {}
+
+@Module({
+  controllers: [DogsController],
+  providers: [
+    {
+      provide: DogsService,
+      inject: ['someString'],
+      useFactory: (str: string) => new DogsService(),
+    },
+    {
+      provide: 'someString',
+      useValue: 'my string',
+    },
+  ],
+  exports: [DogsService],
+})
+export class DogsModule {}
+
+
+@Controller('cats')
+export class CatsController {}
+@Injectable()
+export class CatsService {}
+
+@Module({
+  controllers: [CatsController],
+  providers: [CatsService],
+})
+export class CatsModule {}
+
+
+export class AnimalsService {}
+@Controller('animals')
+export class AnimalsController {}
+
+@Module({
+  imports: [CatsModule, DogsModule, HamstersModule],
+  controllers: [AnimalsController],
+  providers: [
+    {
+      provide: AnimalsService,
+      useValue: new AnimalsService(),
+    }
+  ],
+  exports: [DogsModule],
+})
+export class AnimalsModule {}
+
+
+@Module({
+  imports: [AnimalsModule],
+})
+export class AppModule {}
+```
+
+</details>
+
+it outputs this:
 
 ```js
 [
   {
     name: 'AppModule',
-    imports: ['AnimalsModule'],
+    imports: [ 'AnimalsModule' ],
     providers: {},
     controllers: [],
-    exports: [],
+    exports: []
   },
   {
     name: 'AnimalsModule',
-    imports: ['CatsModule', 'DogsModule', 'HamstersModule'],
-    providers: {
-      AnimalsService: {
-        method: 'value',
-      },
-    },
-    controllers: ['AnimalsController'],
-    exports: ['DogsModule'],
+    imports: [ 'CatsModule', 'DogsModule', 'HamstersModule' ],
+    providers: { AnimalsService: { method: 'value' } },
+    controllers: [ 'AnimalsController' ],
+    exports: [ 'DogsModule' ]
   },
   {
     name: 'CatsModule',
     imports: [],
-    providers: {
-      CatsService: {
-        method: 'standard',
-      },
-    },
-    controllers: ['CatsController'],
-    exports: [],
+    providers: { CatsService: { method: 'standard' } },
+    controllers: [ 'CatsController' ],
+    exports: []
   },
   {
     name: 'DogsModule',
     imports: [],
     providers: {
-      DogsService: {
-        method: 'factory',
-        injections: ['someString'],
-      },
-      someString: {
-        method: 'value',
-      },
+      DogsService: { method: 'factory', injections: [ 'someString' ] },
+      someString: { method: 'value' }
     },
-    controllers: ['DogsController'],
-    exports: ['DogsService'],
+    controllers: [ 'DogsController' ],
+    exports: [ 'DogsService' ]
   },
   {
     name: 'HamstersModule',
     imports: [],
-    providers: {
-      HamstersService: {
-        method: 'standard',
-      },
-    },
-    controllers: ['HamstersController'],
-    exports: [],
-  },
-];
+    providers: { HamstersService: { method: 'standard' } },
+    controllers: [ 'HamstersController' ],
+    exports: []
+  }
+]
 ```
 
 In this example, `AppModule` imports `AnimalsModule`, and `AnimalsModule` imports `CatsModule`, `DogsModule`, and `HamstersModule` and each of those has its own set of `providers` and `controllers`.
