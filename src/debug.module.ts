@@ -14,6 +14,15 @@ import {
 } from './spelunker.interface';
 import { UndefinedClassObject } from './spelunker.messages';
 
+function isObject(val: any): val is object {
+  const isNil = val == null;
+  return !isNil && typeof val === 'object';
+}
+
+function hasProp(val: any, property: string): boolean {
+  return isObject(val) && Object.prototype.hasOwnProperty.call(property);
+}
+
 export class DebugModule {
   private static seenModules: Type<any>[] = [];
   static async debug(
@@ -243,10 +252,10 @@ export class DebugModule {
           dependencies: [],
           type: 'class',
         };
-        if (provider.useValue) {
+        if (hasProp(provider, 'useValue')) {
           newProvider.type = 'value';
           dependencies = () => [];
-        } else if (provider.useFactory) {
+        } else if (hasProp(provider, 'useFactory')) {
           newProvider.type = 'factory';
           dependencies = () =>
             (provider.inject ?? []).map(this.getProviderName);
