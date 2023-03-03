@@ -14,12 +14,15 @@ import {
 } from './spelunker.interface';
 import { UndefinedClassObject } from './spelunker.messages';
 
-function isObject(val: any): val is object {
+function isObject(val: any): val is Record<any, any> {
   const isNil = val == null;
   return !isNil && typeof val === 'object';
 }
 
-function hasProp(val: any, property: string): boolean {
+function hasProp<T extends string = string>(
+  val: any,
+  property: T,
+): val is Record<T, any> {
   return isObject(val) && Object.prototype.hasOwnProperty.call(val, property);
 }
 
