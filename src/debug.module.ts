@@ -20,7 +20,7 @@ function isObject(val: any): val is object {
 }
 
 function hasProp(val: any, property: string): boolean {
-  return isObject(val) && Object.prototype.hasOwnProperty.call(property);
+  return isObject(val) && Object.prototype.hasOwnProperty.call(val, property);
 }
 
 export class DebugModule {
@@ -259,10 +259,14 @@ export class DebugModule {
           newProvider.type = 'factory';
           dependencies = () =>
             (provider.inject ?? []).map(this.getProviderName);
-        } else {
+        } else if (hasProp(provider, 'useClass')) {
           newProvider.type = 'class';
-          dependencies = () =>
-            this.getDependencies(provider.useClass ?? provider.useExisting);
+          dependencies = () => this.getDependencies(provider.useClass);
+        } else if (hasProp(provider, 'useExisting')) {
+          newProvider.type = 'class';
+          dependencies = () => this.getDependencies(provider.useExisting);
+        } else {
+          throw new Error('Unknown provider type');
         }
         newProvider.dependencies = dependencies();
         debuggedProviders.push(newProvider);
