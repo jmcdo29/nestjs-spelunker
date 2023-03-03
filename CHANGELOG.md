@@ -1,5 +1,11 @@
 ## [0.4.1](https://github.com/jmcdo29/nestjs-spelunker/compare/0.4.0...0.4.1) (2020-08-09)
 
+## 1.1.4
+
+### Patch Changes
+
+- 178c888: Allow value and factory providers to have falsy values instead of treating them as a class providers
+
 ## 1.1.3
 
 ### Patch Changes
