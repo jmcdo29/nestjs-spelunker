@@ -23,7 +23,7 @@ export class DebugModule {
     const debuggedTree: DebuggedTree[] = [];
     if (modRef === undefined) {
       process.stdout.write(
-        `The module "${importingModule}" is trying to import an undefined module. Do you have an unmarked circular dependency?`,
+        `The module "${importingModule}" is trying to import an undefined module. Do you have an unmarked circular dependency?\n`,
       );
       return [];
     }
@@ -276,14 +276,25 @@ export class DebugModule {
         Type<any>
       >) || [];
     for (const dep of typedDeps) {
-      retDeps.push(dep.name);
+      if (!dep) {
+      }
+      retDeps.push(dep?.name ?? 'UNKNOWN');
     }
     const selfDeps =
       (Reflect.getMetadata(SELF_DECLARED_DEPS_METADATA, classObj) as [
-        { index: number; param: string },
+        { index: number; param: string | { forwardRef: () => Function } },
       ]) || [];
     for (const selfDep of selfDeps) {
-      retDeps[selfDep.index] = selfDep.param;
+      let dep = selfDep.param;
+      if (typeof dep === 'object') {
+        dep = dep.forwardRef().name;
+      }
+      retDeps[selfDep.index] = dep;
+    }
+    if (retDeps.includes('UNKNOWN')) {
+      process.stdout.write(
+        `The provider "${classObj.name}" is trying to inject an undefined dependency. Do you have '@Inject(forwardRef())' in use here?\n`,
+      );
     }
     return retDeps;
   }
