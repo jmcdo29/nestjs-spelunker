@@ -292,8 +292,6 @@ export class DebugModule {
         Type<any>
       >) || [];
     for (const dep of typedDeps) {
-      if (!dep) {
-      }
       retDeps.push(dep?.name ?? 'UNKNOWN');
     }
     const selfDeps =
