@@ -15,10 +15,6 @@ import { AppModule } from './app.module';
 
 export const SpelunkerSuite = suite<{ app: INestApplication }>(
   'SpelunkerSuite',
-  {
-    // @ts-expect-error property will be defined in the `before` context
-    app: undefined,
-  },
 );
 
 SpelunkerSuite.before(async (context) => {
