@@ -1,5 +1,11 @@
 ## [0.4.1](https://github.com/jmcdo29/nestjs-spelunker/compare/0.4.0...0.4.1) (2020-08-09)
 
+## 1.1.5
+
+### Patch Changes
+
+- 5400375: Fix the fact that circular dependencies didn't actually log correctly with the debug module
+
 ## 1.1.4
 
 ### Patch Changes
