@@ -10,23 +10,43 @@ import { Module as NestModule } from '@nestjs/core/injector/module';
 import { SpelunkedTree } from './spelunker.interface';
 import { UndefinedProvider } from './spelunker.messages';
 
+export type ExplorationOpts = {
+  ignoreImports: Array<RegExp | ((moduleName: string) => boolean)>;
+};
+
 export class ExplorationModule {
-  static explore(app: INestApplicationContext): SpelunkedTree[] {
+  static explore(
+    app: INestApplicationContext,
+    opts?: ExplorationOpts,
+  ): SpelunkedTree[] {
     const modulesArray = Array.from(
       ((app as any).container as NestContainer).getModules().values(),
     );
 
-    const dependencyMap = modulesArray
-      .filter((module) => module.metatype !== InternalCoreModule)
-      .map(
-        (module): SpelunkedTree => ({
-          name: module.metatype.name,
-          imports: this.getImports(module),
-          providers: this.getProviders(module),
-          controllers: this.getControllers(module),
-          exports: this.getExports(module),
-        }),
+    const ignoreImportsPredicateFns = (opts?.ignoreImports || []).map(
+      (ignoreImportFnOrRegex) =>
+        ignoreImportFnOrRegex instanceof RegExp
+          ? (moduleName: string) => ignoreImportFnOrRegex.test(moduleName)
+          : ignoreImportFnOrRegex,
+    );
+
+    const shouldIncludeModule = (module: NestModule): boolean => {
+      const moduleName = module.metatype.name;
+      return (
+        module.metatype !== InternalCoreModule &&
+        !ignoreImportsPredicateFns.some((predicate) => predicate(moduleName))
       );
+    };
+
+    const dependencyMap = modulesArray.filter(shouldIncludeModule).map(
+      (module): SpelunkedTree => ({
+        name: module.metatype.name,
+        imports: this.getImports(module),
+        providers: this.getProviders(module),
+        controllers: this.getControllers(module),
+        exports: this.getExports(module),
+      }),
+    );
     return dependencyMap;
   }
 
