@@ -35,6 +35,18 @@ async function bootstrap() {
 
 The `SpelunkerModule` will not get in the way of application bootstrapping, and will still allow for the server to listen.
 
+#### Excluding modules
+
+```ts
+SpelunkerModule.explore(app, {
+  // A list of regexes or predicate functions to apply over modules that will be ignored
+  ignoreImports: [
+    /^TypeOrmModule/i,
+    (moduleName) => moduleName.endsWith('something'),
+  ],
+})
+```
+
 ### Exploration Sample Output
 
 Given the following source code
