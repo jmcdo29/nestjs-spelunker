@@ -38,15 +38,19 @@ export class ExplorationModule {
       );
     };
 
-    const dependencyMap = modulesArray.filter(shouldIncludeModule).map(
-      (module): SpelunkedTree => ({
-        name: module.metatype.name,
-        imports: this.getImports(module),
-        providers: this.getProviders(module),
-        controllers: this.getControllers(module),
-        exports: this.getExports(module),
-      }),
-    );
+    // NOTE: Using 'forEach' here instead of filter+map for performance reasons.
+    const dependencyMap: SpelunkedTree[] = [];
+    modulesArray.forEach((nestjsModule) => {
+      if (shouldIncludeModule(nestjsModule)) {
+        dependencyMap.push({
+          name: nestjsModule.metatype.name,
+          imports: this.getImports(nestjsModule),
+          providers: this.getProviders(nestjsModule),
+          controllers: this.getControllers(nestjsModule),
+          exports: this.getExports(nestjsModule),
+        });
+      }
+    });
     return dependencyMap;
   }
 
