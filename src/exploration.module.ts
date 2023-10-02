@@ -12,21 +12,21 @@ import { UndefinedProvider } from './spelunker.messages';
 
 export class ExplorationModule {
   static explore(app: INestApplicationContext): SpelunkedTree[] {
-    const dependencyMap: SpelunkedTree[] = [];
     const modulesArray = Array.from(
       ((app as any).container as NestContainer).getModules().values(),
     );
-    modulesArray
+
+    const dependencyMap = modulesArray
       .filter((module) => module.metatype !== InternalCoreModule)
-      .forEach((module) => {
-        dependencyMap.push({
+      .map(
+        (module): SpelunkedTree => ({
           name: module.metatype.name,
           imports: this.getImports(module),
           providers: this.getProviders(module),
           controllers: this.getControllers(module),
           exports: this.getExports(module),
-        });
-      });
+        }),
+      );
     return dependencyMap;
   }
 
