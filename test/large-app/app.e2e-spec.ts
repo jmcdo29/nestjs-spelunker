@@ -62,3 +62,31 @@ SpelunkerSuite(
     );
   },
 );
+
+SpelunkerSuite(
+  'Should exclude modules according to the `ignoreImports` option',
+  ({ app }) => {
+    const emptyTree = SpelunkerModule.explore(app, {
+      ignoreImports: [
+        // for type-sake coverage only
+        /^this_will_not_pass$/,
+        // for type-sake coverage only
+        (moduleName) => moduleName.startsWith('this_will_not_pass_either'),
+        // excluding everything
+        /.+/,
+      ],
+    });
+    equal(emptyTree.length, 0);
+
+    const nonEmptyTree = SpelunkerModule.explore(app, {
+      ignoreImports: [(moduleName) => moduleName.includes('Core')],
+    });
+    equal(nonEmptyTree.map((module) => module.name).sort(), [
+      'AnimalsModule',
+      'AppModule',
+      'CatsModule',
+      'DogsModule',
+      'HamstersModule',
+    ]);
+  },
+);

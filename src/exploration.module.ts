@@ -10,23 +10,47 @@ import { Module as NestModule } from '@nestjs/core/injector/module';
 import { SpelunkedTree } from './spelunker.interface';
 import { UndefinedProvider } from './spelunker.messages';
 
+export type ExplorationOpts = {
+  ignoreImports: Array<RegExp | ((moduleName: string) => boolean)>;
+};
+
 export class ExplorationModule {
-  static explore(app: INestApplicationContext): SpelunkedTree[] {
-    const dependencyMap: SpelunkedTree[] = [];
+  static explore(
+    app: INestApplicationContext,
+    opts?: ExplorationOpts,
+  ): SpelunkedTree[] {
     const modulesArray = Array.from(
       ((app as any).container as NestContainer).getModules().values(),
     );
-    modulesArray
-      .filter((module) => module.metatype !== InternalCoreModule)
-      .forEach((module) => {
+
+    const ignoreImportsPredicateFns = (opts?.ignoreImports || []).map(
+      (ignoreImportFnOrRegex) =>
+        ignoreImportFnOrRegex instanceof RegExp
+          ? (moduleName: string) => ignoreImportFnOrRegex.test(moduleName)
+          : ignoreImportFnOrRegex,
+    );
+
+    const shouldIncludeModule = (module: NestModule): boolean => {
+      const moduleName = module.metatype.name;
+      return (
+        module.metatype !== InternalCoreModule &&
+        !ignoreImportsPredicateFns.some((predicate) => predicate(moduleName))
+      );
+    };
+
+    // NOTE: Using 'forEach' here instead of filter+map for performance reasons.
+    const dependencyMap: SpelunkedTree[] = [];
+    modulesArray.forEach((nestjsModule) => {
+      if (shouldIncludeModule(nestjsModule)) {
         dependencyMap.push({
-          name: module.metatype.name,
-          imports: this.getImports(module),
-          providers: this.getProviders(module),
-          controllers: this.getControllers(module),
-          exports: this.getExports(module),
+          name: nestjsModule.metatype.name,
+          imports: this.getImports(nestjsModule),
+          providers: this.getProviders(nestjsModule),
+          controllers: this.getControllers(nestjsModule),
+          exports: this.getExports(nestjsModule),
         });
-      });
+      }
+    });
     return dependencyMap;
   }
 

@@ -1,7 +1,7 @@
 import { INestApplicationContext, Type } from '@nestjs/common';
 
 import { DebugModule } from './debug.module';
-import { ExplorationModule } from './exploration.module';
+import { ExplorationModule, ExplorationOpts } from './exploration.module';
 import { GraphingModule } from './graphing.module';
 import {
   DebuggedTree,
@@ -11,8 +11,11 @@ import {
 } from './spelunker.interface';
 
 export class SpelunkerModule {
-  static explore(app: INestApplicationContext): SpelunkedTree[] {
-    return ExplorationModule.explore(app);
+  static explore(
+    app: INestApplicationContext,
+    opts?: ExplorationOpts,
+  ): SpelunkedTree[] {
+    return ExplorationModule.explore(app, opts);
   }
 
   static async debug(mod: Type<any>): Promise<DebuggedTree[]> {
