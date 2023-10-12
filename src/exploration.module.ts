@@ -143,6 +143,6 @@ export class ExplorationModule {
   private static tokenIsOptionalToken(
     token: InjectionToken | OptionalFactoryDependency,
   ): token is OptionalFactoryDependency {
-    return Object.keys(token).includes('token');
+    return !!(token as any)['token'];
   }
 }
