@@ -13,9 +13,8 @@ import {
 } from '../fixtures/output';
 import { AppModule } from './app.module';
 
-export const SpelunkerSuite = suite<{ app: INestApplication }>(
-  'SpelunkerSuite',
-);
+export const SpelunkerSuite =
+  suite<{ app: INestApplication }>('SpelunkerSuite');
 
 SpelunkerSuite.before(async (context) => {
   context.app = await NestFactory.create(AppModule, { logger: false });

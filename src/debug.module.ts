@@ -296,6 +296,7 @@ export class DebugModule {
     }
     const selfDeps =
       (Reflect.getMetadata(SELF_DECLARED_DEPS_METADATA, classObj) as [
+        // eslint-disable-next-line @typescript-eslint/ban-types
         { index: number; param: string | { forwardRef: () => Function } },
       ]) || [];
     for (const selfDep of selfDeps) {

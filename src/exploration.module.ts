@@ -38,9 +38,9 @@ export class ExplorationModule {
       );
     };
 
-    // NOTE: Using 'forEach' here instead of filter+map for performance reasons.
+    // NOTE: Using for..of here instead of filter+map for performance reasons.
     const dependencyMap: SpelunkedTree[] = [];
-    modulesArray.forEach((nestjsModule) => {
+    for (const nestjsModule of modulesArray) {
       if (shouldIncludeModule(nestjsModule)) {
         dependencyMap.push({
           name: nestjsModule.metatype.name,
@@ -50,36 +50,41 @@ export class ExplorationModule {
           exports: this.getExports(nestjsModule),
         });
       }
-    });
+    }
     return dependencyMap;
   }
 
   private static getImports(module: NestModule): string[] {
-    return Array.from(module.imports)
-      .filter((module) => module.metatype.name !== InternalCoreModule.name)
-      .map((module) => module.metatype.name);
+    // NOTE: Using for..of here instead of filter+map for performance reasons.
+    const importsNames: string[] = [];
+    for (const importedModule of module.imports.values()) {
+      if (importedModule.metatype.name !== InternalCoreModule.name) {
+        importsNames.push(importedModule.metatype.name);
+      }
+    }
+    return importsNames;
   }
 
-  private static getProviders(module: NestModule): any {
-    const providerList: Record<
-      string,
-      { method: string; injections?: string[] }
-    > = {};
-    const providerNames = Array.from(module.providers.keys()).filter(
-      (provider) =>
-        provider !== module.metatype &&
-        provider !== ModuleRef &&
-        provider !== ApplicationConfig,
-    );
-    providerNames.map((prov) => {
-      const providerToken = this.getInjectionToken(prov);
-      const provider = module.providers.get(prov);
-      if (provider === undefined) {
+  private static getProviders(module: NestModule): SpelunkedTree['providers'] {
+    const providerList: SpelunkedTree['providers'] = {};
+    // NOTE: Using for..of here instead of filter+forEach for performance reasons.
+    for (const provider of module.providers.keys()) {
+      if (
+        provider === module.metatype ||
+        provider === ModuleRef ||
+        provider === ApplicationConfig
+      ) {
+        continue;
+      }
+
+      const providerToken = this.getInjectionToken(provider);
+      const providerInstanceWrapper = module.providers.get(provider);
+      if (providerInstanceWrapper === undefined) {
         throw new Error(UndefinedProvider(providerToken));
       }
-      const metatype = provider.metatype;
+      const metatype = providerInstanceWrapper.metatype;
       const name = (metatype && metatype.name) || 'useValue';
-      let provided: { method: string; injections?: string[] };
+      let provided: SpelunkedTree['providers'][number];
       switch (name) {
         case 'useValue':
           provided = {
@@ -94,7 +99,7 @@ export class ExplorationModule {
         case 'useFactory':
           provided = {
             method: 'factory',
-            injections: provider.inject?.map((injection) =>
+            injections: providerInstanceWrapper.inject?.map((injection) =>
               this.getInjectionToken(injection),
             ),
           };
@@ -105,20 +110,24 @@ export class ExplorationModule {
           };
       }
       providerList[providerToken] = provided;
-    });
+    }
     return providerList;
   }
 
   private static getControllers(module: NestModule): string[] {
-    return Array.from(module.controllers.values()).map(
-      (controller) => controller.metatype.name,
-    );
+    const controllersNames: string[] = [];
+    for (const controller of module.controllers.values()) {
+      controllersNames.push(controller.metatype.name);
+    }
+    return controllersNames;
   }
 
   private static getExports(module: NestModule): string[] {
-    return Array.from(module.exports).map((exportValue) =>
-      this.getInjectionToken(exportValue),
-    );
+    const exportsNames: string[] = [];
+    for (const exportValue of module.exports.values()) {
+      exportsNames.push(this.getInjectionToken(exportValue));
+    }
+    return exportsNames;
   }
 
   private static getInjectionToken(
@@ -134,6 +143,6 @@ export class ExplorationModule {
   private static tokenIsOptionalToken(
     token: InjectionToken | OptionalFactoryDependency,
   ): token is OptionalFactoryDependency {
-    return Object.keys(token).includes('token');
+    return !!(token as any)['token'];
   }
 }
