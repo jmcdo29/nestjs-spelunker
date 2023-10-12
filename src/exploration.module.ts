@@ -70,19 +70,22 @@ export class ExplorationModule {
       string,
       { method: string; injections?: string[] }
     > = {};
-    const providerNames = Array.from(module.providers.keys()).filter(
-      (provider) =>
-        provider !== module.metatype &&
-        provider !== ModuleRef &&
-        provider !== ApplicationConfig,
-    );
-    providerNames.map((prov) => {
-      const providerToken = this.getInjectionToken(prov);
-      const provider = module.providers.get(prov);
-      if (provider === undefined) {
+    // NOTE: Using for..of here instead of filter+forEach for performance reasons.
+    for (const provider of module.providers.keys()) {
+      if (
+        provider === module.metatype ||
+        provider === ModuleRef ||
+        provider === ApplicationConfig
+      ) {
+        continue;
+      }
+
+      const providerToken = this.getInjectionToken(provider);
+      const providerInstanceWrapper = module.providers.get(provider);
+      if (providerInstanceWrapper === undefined) {
         throw new Error(UndefinedProvider(providerToken));
       }
-      const metatype = provider.metatype;
+      const metatype = providerInstanceWrapper.metatype;
       const name = (metatype && metatype.name) || 'useValue';
       let provided: { method: string; injections?: string[] };
       switch (name) {
@@ -99,7 +102,7 @@ export class ExplorationModule {
         case 'useFactory':
           provided = {
             method: 'factory',
-            injections: provider.inject?.map((injection) =>
+            injections: providerInstanceWrapper.inject?.map((injection) =>
               this.getInjectionToken(injection),
             ),
           };
@@ -110,7 +113,7 @@ export class ExplorationModule {
           };
       }
       providerList[providerToken] = provided;
-    });
+    }
     return providerList;
   }
 
