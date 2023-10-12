@@ -65,11 +65,8 @@ export class ExplorationModule {
     return importsNames;
   }
 
-  private static getProviders(module: NestModule): any {
-    const providerList: Record<
-      string,
-      { method: string; injections?: string[] }
-    > = {};
+  private static getProviders(module: NestModule): SpelunkedTree['providers'] {
+    const providerList: SpelunkedTree['providers'] = {};
     // NOTE: Using for..of here instead of filter+forEach for performance reasons.
     for (const provider of module.providers.keys()) {
       if (
@@ -87,7 +84,7 @@ export class ExplorationModule {
       }
       const metatype = providerInstanceWrapper.metatype;
       const name = (metatype && metatype.name) || 'useValue';
-      let provided: { method: string; injections?: string[] };
+      let provided: SpelunkedTree['providers'][number];
       switch (name) {
         case 'useValue':
           provided = {
