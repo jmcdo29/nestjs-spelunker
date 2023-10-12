@@ -1,5 +1,9 @@
 lockfileVersion: '6.0'
 
+settings:
+  autoInstallPeers: true
+  excludeLinksFromLockfile: false
+
 dependencies:
   '@ogma/styler':
     specifier: ^1.0.0
@@ -90,9 +94,6 @@ devDependencies:
   reflect-metadata:
     specifier: ^0.1.13
     version: 0.1.13
-  rimraf:
-    specifier: ^3.0.2
-    version: 3.0.2
   rxjs:
     specifier: ^7.5.5
     version: 7.5.5
