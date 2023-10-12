@@ -55,9 +55,14 @@ export class ExplorationModule {
   }
 
   private static getImports(module: NestModule): string[] {
-    return Array.from(module.imports)
-      .filter((module) => module.metatype.name !== InternalCoreModule.name)
-      .map((module) => module.metatype.name);
+    // NOTE: Using 'forEach' here instead of filter+map for performance reasons.
+    const importsNames: string[] = [];
+    module.imports.forEach((importedModule) => {
+      if (importedModule.metatype.name !== InternalCoreModule.name) {
+        importsNames.push(importedModule.metatype.name);
+      }
+    });
+    return importsNames;
   }
 
   private static getProviders(module: NestModule): any {
