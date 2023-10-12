@@ -16,7 +16,9 @@ export class GraphingModule {
       new Map<string, SpelunkedNode>(),
     );
 
-    nodeMap.forEach((node) => this.findDependencies(node, nodeMap));
+    for (const [, node] of nodeMap) {
+      this.findDependencies(node, nodeMap);
+    }
 
     return this.findRoot(nodeMap);
   }
@@ -63,9 +65,12 @@ export class GraphingModule {
 
     visitedNodes.add(root);
 
-    return [...root.dependencies.values()].reduce((set, n) => {
-      set.add({ from: root, to: n });
-      this.getEdgesRecursively(n, visitedNodes).forEach((e) => set.add(e));
+    return [...root.dependencies.values()].reduce((set, node) => {
+      set.add({ from: root, to: node });
+      const edges = this.getEdgesRecursively(node, visitedNodes);
+      for (const edge of edges) {
+        set.add(edge);
+      }
 
       return set;
     }, new Set<SpelunkedEdge>());

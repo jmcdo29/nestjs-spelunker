@@ -38,9 +38,9 @@ export class ExplorationModule {
       );
     };
 
-    // NOTE: Using 'forEach' here instead of filter+map for performance reasons.
+    // NOTE: Using for..of here instead of filter+map for performance reasons.
     const dependencyMap: SpelunkedTree[] = [];
-    modulesArray.forEach((nestjsModule) => {
+    for (const nestjsModule of modulesArray) {
       if (shouldIncludeModule(nestjsModule)) {
         dependencyMap.push({
           name: nestjsModule.metatype.name,
@@ -50,18 +50,18 @@ export class ExplorationModule {
           exports: this.getExports(nestjsModule),
         });
       }
-    });
+    }
     return dependencyMap;
   }
 
   private static getImports(module: NestModule): string[] {
-    // NOTE: Using 'forEach' here instead of filter+map for performance reasons.
+    // NOTE: Using for..of here instead of filter+map for performance reasons.
     const importsNames: string[] = [];
-    module.imports.forEach((importedModule) => {
+    for (const importedModule of module.imports.values()) {
       if (importedModule.metatype.name !== InternalCoreModule.name) {
         importsNames.push(importedModule.metatype.name);
       }
-    });
+    }
     return importsNames;
   }
 
@@ -124,9 +124,9 @@ export class ExplorationModule {
 
   private static getExports(module: NestModule): string[] {
     const exportsNames: string[] = [];
-    module.exports.forEach((exportValue) => {
+    for (const exportValue of module.exports.values()) {
       exportsNames.push(this.getInjectionToken(exportValue));
-    });
+    }
     return exportsNames;
   }
 
