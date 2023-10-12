@@ -115,15 +115,19 @@ export class ExplorationModule {
   }
 
   private static getControllers(module: NestModule): string[] {
-    return Array.from(module.controllers.values()).map(
-      (controller) => controller.metatype.name,
-    );
+    const controllersNames: string[] = [];
+    for (const controller of module.controllers.values()) {
+      controllersNames.push(controller.metatype.name);
+    }
+    return controllersNames;
   }
 
   private static getExports(module: NestModule): string[] {
-    return Array.from(module.exports).map((exportValue) =>
-      this.getInjectionToken(exportValue),
-    );
+    const exportsNames: string[] = [];
+    module.exports.forEach((exportValue) => {
+      exportsNames.push(this.getInjectionToken(exportValue));
+    });
+    return exportsNames;
   }
 
   private static getInjectionToken(
