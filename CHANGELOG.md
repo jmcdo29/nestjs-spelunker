@@ -1,5 +1,11 @@
 ## [0.4.1](https://github.com/jmcdo29/nestjs-spelunker/compare/0.4.0...0.4.1) (2020-08-09)
 
+## 1.3.1
+
+### Patch Changes
+
+- e3ac557: do not display excluded modules on `imports` list of other modules
+
 ## 1.3.0
 
 ### Minor Changes
