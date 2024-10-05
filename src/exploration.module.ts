@@ -11,7 +11,7 @@ import { SpelunkedTree } from './spelunker.interface';
 import { UndefinedProvider } from './spelunker.messages';
 
 export type ExplorationOpts = {
-  ignoreImports: Array<RegExp | ((moduleName: string) => boolean)>;
+  ignoreImports?: Array<RegExp | ((moduleName: string) => boolean)>;
 };
 
 export class ExplorationModule {
