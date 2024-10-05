@@ -11,8 +11,10 @@ import { SpelunkedTree } from './spelunker.interface';
 import { UndefinedProvider } from './spelunker.messages';
 
 export type ExplorationOpts = {
-  ignoreImports: Array<RegExp | ((moduleName: string) => boolean)>;
+  ignoreImports?: Array<RegExp | ((moduleName: string) => boolean)>;
 };
+
+type ShouldIncludeModuleFn = (module: NestModule) => boolean;
 
 export class ExplorationModule {
   static explore(
@@ -29,8 +31,9 @@ export class ExplorationModule {
           ? (moduleName: string) => ignoreImportFnOrRegex.test(moduleName)
           : ignoreImportFnOrRegex,
     );
-
-    const shouldIncludeModule = (module: NestModule): boolean => {
+    const shouldIncludeModule: ShouldIncludeModuleFn = (
+      module: NestModule,
+    ): boolean => {
       const moduleName = module.metatype.name;
       return (
         module.metatype !== InternalCoreModule &&
@@ -44,7 +47,7 @@ export class ExplorationModule {
       if (shouldIncludeModule(nestjsModule)) {
         dependencyMap.push({
           name: nestjsModule.metatype.name,
-          imports: this.getImports(nestjsModule),
+          imports: this.getImports(nestjsModule, shouldIncludeModule),
           providers: this.getProviders(nestjsModule),
           controllers: this.getControllers(nestjsModule),
           exports: this.getExports(nestjsModule),
@@ -54,11 +57,14 @@ export class ExplorationModule {
     return dependencyMap;
   }
 
-  private static getImports(module: NestModule): string[] {
+  private static getImports(
+    module: NestModule,
+    shouldIncludeModuleFn: ShouldIncludeModuleFn,
+  ): string[] {
     // NOTE: Using for..of here instead of filter+map for performance reasons.
     const importsNames: string[] = [];
     for (const importedModule of module.imports.values()) {
-      if (importedModule.metatype.name !== InternalCoreModule.name) {
+      if (shouldIncludeModuleFn(importedModule)) {
         importsNames.push(importedModule.metatype.name);
       }
     }
