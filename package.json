@@ -57,8 +57,7 @@
   },
   "peerDependencies": {
     "@nestjs/common": ">6.11.0",
-    "@nestjs/core": ">6.11.0",
-    "reflect-metadata": "^0.1.0"
+    "@nestjs/core": ">6.11.0"
   },
   "dependencies": {
     "@ogma/styler": "^1.0.0"
