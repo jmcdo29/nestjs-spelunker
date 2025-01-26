@@ -1,5 +1,11 @@
 ## [0.4.1](https://github.com/jmcdo29/nestjs-spelunker/compare/0.4.0...0.4.1) (2020-08-09)
 
+## 1.3.2
+
+### Patch Changes
+
+- b131996: Remove `reflect-metadata` from required peer dependencies list
+
 ## 1.3.1
 
 ### Patch Changes
